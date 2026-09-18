@@ -1,0 +1,44 @@
+[
+  {
+    "id": 1,
+    "name": "Solution Design & Architecture",
+    "weight": 17,
+    "count": 11
+  },
+  {
+    "id": 2,
+    "name": "Models, Prompting & Context Engineering",
+    "weight": 13,
+    "count": 8
+  },
+  {
+    "id": 3,
+    "name": "Integration",
+    "weight": 19,
+    "count": 12
+  },
+  {
+    "id": 4,
+    "name": "Evaluation, Testing & Optimization",
+    "weight": 16,
+    "count": 10
+  },
+  {
+    "id": 5,
+    "name": "Governance, Safety & Risk Management",
+    "weight": 14,
+    "count": 9
+  },
+  {
+    "id": 6,
+    "name": "Stakeholder Communication & Lifecycle",
+    "weight": 14,
+    "count": 9
+  },
+  {
+    "id": 7,
+    "name": "Developer Productivity & Enablement",
+    "weight": 7,
+    "count": 4
+  }
+]

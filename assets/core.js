@@ -1,0 +1,14 @@
+(function(root){
+'use strict';
+const VERSION=1;
+function rng(seed){let a=seed>>>0;return()=>{a+=0x6D2B79F5;let t=a;t=Math.imul(t^(t>>>15),t|1);t^=t+Math.imul(t^(t>>>7),t|61);return((t^(t>>>14))>>>0)/4294967296;};}
+function shuffle(values,random){const a=[...values];for(let i=a.length-1;i>0;i--){const j=Math.floor(random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+function createAttempt(questions,mode,seed,now=Date.now(),domain=0){const r=rng(seed);let selected=questions.filter(q=>!domain||q.domain===domain);return {version:VERSION,mode,seed,started:now,deadline:mode==='timed'?now+120*60*1000:null,ids:shuffle(selected.map(q=>q.id),r),orders:Object.fromEntries(selected.map(q=>[q.id,shuffle((q.type==='match'?q.labels:q.choices).map((_,i)=>i),r)])),answers:{},flags:[],checked:[],index:0,submitted:null,domain};}
+function complete(q,a){if(q.type==='match')return Array.isArray(a)&&a.length===q.rows.length&&a.every(v=>Number.isInteger(v)&&v>=0&&v<q.labels.length);return Array.isArray(a)&&a.length===(q.type==='multi'?2:1)&&new Set(a).size===a.length&&a.every(v=>Number.isInteger(v)&&v>=0&&v<q.choices.length);}
+function correct(q,a){return complete(q,a)&&(q.type==='match'?q.rows.every((row,i)=>a[i]===row.answer):q.answer.every(v=>a.includes(v)));}
+function result(attempt,questions){const selected=attempt.ids.map(id=>questions.find(q=>q.id===id));const score=selected.filter(q=>correct(q,attempt.answers[q.id])).length;const byDomain={};for(const q of selected){const d=byDomain[q.domain]||={total:0,correct:0};d.total++;d.correct+=Number(correct(q,attempt.answers[q.id]));}return{score,total:selected.length,percent:Math.round(score/selected.length*100),byDomain};}
+function shouldExpire(a,now=Date.now()){return Boolean(a&&!a.submitted&&a.mode==='timed'&&Number.isFinite(a.deadline)&&now>=a.deadline);}
+function validAttempt(a,questions){if(!a||a.version!==VERSION||!['timed','study'].includes(a.mode)||!Array.isArray(a.ids)||!a.ids.length||new Set(a.ids).size!==a.ids.length||!a.answers||!a.orders||!Array.isArray(a.flags)||!Array.isArray(a.checked)||!Number.isInteger(a.index)||a.index<0||a.index>=a.ids.length||!Number.isFinite(a.started)||(a.mode==='timed'&&!Number.isFinite(a.deadline))||(a.submitted!==null&&!Number.isFinite(a.submitted)))return false;
+return a.ids.every(id=>{if(a.answers[id]!==undefined&&(!Array.isArray(a.answers[id])||a.answers[id].some(v=>v!==null&&!Number.isInteger(v))))return false;const q=questions.find(q=>q.id===id),o=a.orders[id];return q&&Array.isArray(o)&&o.length===(q.type==='match'?q.labels:q.choices).length&&new Set(o).size===o.length&&o.every(i=>Number.isInteger(i)&&i>=0&&i<o.length);});}
+const api={VERSION,rng,shuffle,createAttempt,complete,correct,result,validAttempt,shouldExpire};if(typeof module!=='undefined'&&module.exports)module.exports=api;else root.ExamCore=api;
+})(typeof window!=='undefined'?window:globalThis);

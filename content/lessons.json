@@ -1,0 +1,811 @@
+[
+  {
+    "id": "start",
+    "title": "A practical path to exam readiness",
+    "subtitle": "Learn the decisions. Practice the trade-offs. Verify the evidence.",
+    "domain": 0,
+    "minutes": 3,
+    "refs": [
+      "blueprint"
+    ],
+    "sections": [
+      {
+        "title": "What this site covers",
+        "body": [
+          "This independent study companion follows the seven-domain blueprint in the supplied Claude Certified Architect – Professional Exam Guide, version 1.0, effective July 2026. Its review notes are an edited synthesis of the owner’s notes, with links to primary references. It is not an Anthropic course or an official exam simulator.",
+          "The mock contains 63 original practice items: 42 single-answer, 14 select-two, and seven matching exercises with six dropdown rows each. The dropdown format is an additional learning exercise requested for this site; the supplied guide confirms multiple-choice and multiple-response items, not this specific dropdown format."
+        ]
+      },
+      {
+        "title": "Use a three-pass study loop",
+        "body": [
+          "First, read the seven domain chapters and explain each architectural decision in your own words. Connect each decision to a constraint: quality, risk, latency, cost, or operational ownership.",
+          "Second, work in study mode. Check an answer only after committing to a choice, then read the explanation and the primary reference. For an incorrect response, identify the evidence in the scenario that should have changed your decision.",
+          "Third, take the full timed mock. It runs for 120 minutes, including time spent away from the page. Flag uncertain items and revisit them before submitting. Results identify domains to review and link back to the relevant chapters."
+        ]
+      },
+      {
+        "title": "Understand the score",
+        "body": [
+          "Each mock question earns one point only when the full answer is correct. Select-two items need exactly the two keyed choices; dropdown items need all six rows correct. Unanswered and incomplete items earn zero. This is this site’s scoring rule, not a representation of undisclosed live-exam scoring.",
+          "The guide lists a passing scaled score of 720 on a 100–1,000 scale. A raw mock percentage cannot be converted to that score without the exam’s scaling method. This site reports practice accuracy and domain breakdowns, with no fabricated pass prediction."
+        ]
+      },
+      {
+        "title": "Source and privacy boundaries",
+        "body": [
+          "Example companies, operational incidents, thresholds, and workloads in practice questions are fictional scenarios used to test real concepts. They are not claims about actual deployments or recollections from a live exam.",
+          "Answers, flags, timer state, and reading progress are stored in this browser. There is no account, backend, analytics script, or server-side score collection. GitHub Pages still handles ordinary hosting requests. A reset clears this site’s saved study state."
+        ]
+      }
+    ]
+  },
+  {
+    "id": "domain-1",
+    "title": "Solution design & architecture",
+    "subtitle": "Choose the simplest architecture that meets the actual requirement.",
+    "domain": 1,
+    "minutes": 3,
+    "refs": [
+      "design",
+      "agents"
+    ],
+    "sections": [
+      {
+        "title": "Start with the work, not the model",
+        "body": [
+          "Map the current process before deciding where Claude belongs. Identify inputs, transformations, deterministic decisions, human judgments, outputs, and feedback. Record the current volume and baseline cost or time. Ask which mistakes are recoverable and which require human approval.",
+          "Separate extraction from enforcement. A model may interpret a messy customer message, but a tested business rule should remain in deterministic code when that rule must hold consistently. The integration contract needs validated inputs, explicit errors, and an owner. Ambiguous extracted values should trigger a defined path rather than a guess."
+        ]
+      },
+      {
+        "title": "Choose a pattern",
+        "body": [
+          "A workflow has a specified control path. An agent selects actions dynamically in response to intermediate evidence. An augmented model can retrieve context or call tools without needing an open-ended autonomous loop. Match the additional complexity to something the task actually requires."
+        ],
+        "rows": [
+          [
+            "Prompt chaining",
+            "Known dependent stages",
+            "Validate intermediate outputs before continuing."
+          ],
+          [
+            "Routing",
+            "Distinct classes of work",
+            "Measure route quality and define a fallback."
+          ],
+          [
+            "Parallelization",
+            "Independent subtasks",
+            "Track completion per task ID before aggregation."
+          ],
+          [
+            "Orchestrator–workers",
+            "Subtasks discovered at runtime",
+            "Define delegation contracts and recovery paths."
+          ],
+          [
+            "Evaluator–optimizer",
+            "An artifact can improve against clear criteria",
+            "Bound iteration and define an exit condition."
+          ]
+        ],
+        "headers": [
+          "Pattern",
+          "Useful when",
+          "Architectural check"
+        ]
+      },
+      {
+        "title": "Design the orchestration contract",
+        "body": [
+          "A delegated task should have a clear objective, bounded scope, required evidence, output shape, and failure signal. Give a specialist the context needed for its work. A critic can inspect a claim and its evidence without inheriting every speculative hypothesis from the producing agent. This reduces anchoring risk; it does not guarantee correctness.",
+          "At a fan-out boundary, account for each dispatched unit by identity. Merely counting results can miss duplicated results and omitted tasks. Timeouts, retries, cancellation, and partial completion must have explicit handling before synthesis.",
+          "An agent loop must execute authorized client tools, return their results, and continue until an appropriate termination condition. Distinguish a request to use a tool from a completed external action. Enforce both a task-completion condition and resource limits."
+        ]
+      },
+      {
+        "title": "Connect the architecture to business value",
+        "body": [
+          "Use the value pillars as a way to clarify the business case: efficiency can reduce time per existing task; productivity can increase useful output; transformation can enable a previously unavailable capability. Cost and service targets constrain the design. These categories can overlap, so state what the scenario is primarily trying to achieve.",
+          "Worked example: a service team handles 400 tickets a week. An assistant that drafts replies can be evaluated on accepted drafts, time saved after review, and error escalation. “Use five agents” is an implementation proposal; “reduce review-adjusted handling time while preserving policy accuracy” is a measurable goal. The numbers are illustrative, not exam thresholds."
+        ]
+      },
+      {
+        "title": "Check your understanding",
+        "body": [
+          "Explain why a known sequence of checks might favor a workflow over an autonomous agent. Then describe what new requirement would justify changing the architecture.",
+          "For a research orchestrator with one failed worker, specify exactly what the user sees and who decides whether a partial result is acceptable."
+        ]
+      }
+    ]
+  },
+  {
+    "id": "domain-2",
+    "title": "Models, prompting & context",
+    "subtitle": "Treat context as a maintained system resource.",
+    "domain": 2,
+    "minutes": 3,
+    "refs": [
+      "design",
+      "cache",
+      "thinking",
+      "context"
+    ],
+    "sections": [
+      {
+        "title": "Select and tune with evidence",
+        "body": [
+          "Choose a model using representative examples and explicit quality, latency, cost, and safety constraints. Public benchmarks can inform a shortlist; they do not establish the best model for your own task. Evaluate the whole configuration rather than the model name alone.",
+          "Where supported, effort and thinking controls are candidates for experimentation. Their parameters vary by model and may change. Check the documentation for the selected model instead of relying on universal claims about fixed budgets or accepted effort values. Changing effort can also alter cache behavior; measure the complete impact."
+        ]
+      },
+      {
+        "title": "Build an explicit prompt contract",
+        "body": [
+          "A reusable prompt should identify the task, available evidence, boundaries, expected output, and what to do when information is insufficient. Separate task instructions from documents and user-supplied content. A retrieved instruction does not gain authority merely by being present in the context.",
+          "Zero-shot instructions describe the behavior directly. Few-shot examples demonstrate format and difficult boundary cases. Reasoning support can help complex tasks, but asking for a long chain of thought is not proof of correctness. Evaluate the final behavior and evidence; do not substitute verbose explanations for checks.",
+          "Keep shared prompt sections versioned and inject task-specific variables through a maintained template. Test changes against the same acceptance cases. Prompts are behavioral guidance, while execution permissions and validators provide separate controls."
+        ]
+      },
+      {
+        "title": "Choose the right context technique",
+        "body": [],
+        "rows": [
+          [
+            "Prompt caching",
+            "Reuse a stable prefix across requests",
+            "Reduces repeated-prefix processing cost; does not free context-window space."
+          ],
+          [
+            "Context editing",
+            "Remove stale tool results",
+            "Preserve information still required for the task."
+          ],
+          [
+            "Compaction",
+            "Summarize accumulated history",
+            "Retain decisions, constraints, and unresolved work."
+          ],
+          [
+            "Tool search",
+            "Discover definitions as needed",
+            "Measure discovery accuracy and added lookup latency."
+          ],
+          [
+            "Retrieval",
+            "Select source evidence per query",
+            "Keep provenance, freshness, and access checks."
+          ]
+        ],
+        "headers": [
+          "Technique",
+          "Purpose",
+          "Caution"
+        ]
+      },
+      {
+        "title": "Diagnose caching precisely",
+        "body": [
+          "Caching depends on a reusable prefix and supported thresholds. Put volatile request identifiers and timestamps after the reusable region. Inspect cache-read and cache-creation usage to determine whether reuse actually occurs. Cache lifetime, prefix changes, and model-specific minimum lengths can all affect results.",
+          "Do not confuse caching with retrieval or memory. It reuses computation on repeated input; it does not automatically preserve a conversation after omitted messages. A cached document still occupies context. Stable configuration and measured usage are better evidence than the statement that caching was enabled."
+        ]
+      },
+      {
+        "title": "Control growth across long tasks",
+        "body": [
+          "Retain durable decisions and active constraints while removing or summarizing bulky intermediate results. An indiscriminate “keep the last four turns” rule may delete essential information. Conversely, copying every historical result into every worker can increase cost and obscure relevant evidence.",
+          "Worked example: a repository assistant has hundreds of tools but needs only one service’s read functions for a request. Scope tools by role and consider deferred discovery. There is no universal numerical tool limit that proves a design is correct. Test discovery and selection on representative tasks."
+        ]
+      }
+    ]
+  },
+  {
+    "id": "domain-3",
+    "title": "Integration",
+    "subtitle": "Make the boundaries explicit: identity, data, tools, and telemetry.",
+    "domain": 3,
+    "minutes": 3,
+    "refs": [
+      "integration",
+      "tools",
+      "rag",
+      "batch",
+      "headless"
+    ],
+    "sections": [
+      {
+        "title": "Separate authentication from authorization",
+        "body": [
+          "Authentication establishes who is calling. Authorization establishes whether that identity may perform an action on a resource. Logging into the application does not authorize every operation a broad backend service account can perform.",
+          "Carry verified identity and tenant context through the request path. Enforce resource-level permissions in trusted code before retrieval or action execution. A tenant ID generated by the model is not an authorization decision. Secrets belong in the runtime or credential service, outside prompts and model-visible tool results."
+        ]
+      },
+      {
+        "title": "Choose the integration mechanism",
+        "body": [
+          "Use a direct API when a controlled application needs a specific programmatic contract. A non-interactive CLI can fit automation that is naturally expressed through an existing command-line tool. For several MCP-compatible assistant clients, an MCP server can provide a reusable discovery and invocation interface.",
+          "An interface standard does not automatically create safe permissions, retries, or audit trails. Define these at the service boundary. Reserve agent-to-agent coordination for cases requiring delegation or negotiation between agents, rather than adding it to a simple lookup service."
+        ]
+      },
+      {
+        "title": "Design the RAG pipeline",
+        "body": [],
+        "rows": [
+          [
+            "Ingest",
+            "Parse approved sources; retain IDs, versions, and access metadata."
+          ],
+          [
+            "Chunk",
+            "Keep meaningful units and heading context; test boundary-spanning questions."
+          ],
+          [
+            "Embed",
+            "Use compatible representations for query and document vectors."
+          ],
+          [
+            "Index",
+            "Store searchable chunks and metadata with a defined refresh process."
+          ],
+          [
+            "Retrieve",
+            "Apply trusted access constraints and select evidence relevant to the query."
+          ],
+          [
+            "Rerank and generate",
+            "Prioritize evidence, produce supported claims, and retain source references."
+          ]
+        ],
+        "headers": [
+          "Stage",
+          "Design concern"
+        ]
+      },
+      {
+        "title": "Match retrieval to the query",
+        "body": [
+          "Exact codes and identifiers benefit from lexical matching; conceptual descriptions can benefit from dense retrieval. A hybrid candidate with reranking is worth evaluating when the workload contains both. Neither hybrid search nor a larger top-k is a universal solution. Measure whether the correct authorized evidence actually arrives in context.",
+          "When changing embedding models, maintain compatible query and document spaces. A practical migration is to build and validate a new index, then switch traffic with rollback available. Mixing incompatible old and new vectors is different from deliberately maintaining separate indexes with matching query encoders.",
+          "A larger context window cannot recover a source that was never retrieved. If failures cluster at document seams, inspect chunk boundaries and parent context before swapping the generation model. If errors start after a refresh, inspect versions, parsing, indexing, and retrieval filters."
+        ]
+      },
+      {
+        "title": "Make tool calls observable and bounded",
+        "body": [
+          "Track request correlation, configuration versions, retrieved source IDs, tool outcome status, retries, latency, and token usage. Redact sensitive fields and set retention and access controls. Full customer profiles and raw credentials do not belong in every trace.",
+          "Bound retries and handle timeouts as explicit outcomes. For writes, determine whether retrying could repeat a side effect and use an appropriate idempotency or reconciliation strategy. Return failures in a form the orchestration layer can handle rather than silently converting them into success."
+        ]
+      },
+      {
+        "title": "Match execution to the deadline",
+        "body": [
+          "Interactive work needs an end-to-end latency budget that includes retrieval, tools, generation, and validation. Offline tasks that tolerate the documented processing window can use Message Batches and handle individual results asynchronously. Do not assume a batch will always finish before a shorter overnight cutoff.",
+          "For Claude Code automation, print mode and a machine-readable output format fit CI better than an interface waiting for terminal input. Credentials, permitted tools, failure status, and job timeouts remain part of the integration design."
+        ]
+      }
+    ]
+  },
+  {
+    "id": "domain-4",
+    "title": "Evaluation, testing & optimization",
+    "subtitle": "Define success before you try to improve it.",
+    "domain": 4,
+    "minutes": 3,
+    "refs": [
+      "integration",
+      "evals",
+      "lifecycle"
+    ],
+    "sections": [
+      {
+        "title": "Turn requirements into acceptance criteria",
+        "body": [
+          "A useful evaluation specifies the task, input conditions, expected behavior, and grading rule. Agree on quality and operational constraints before tuning prompts. Include accuracy, task completion, latency, cost, safety, and security where relevant. A beautiful answer can still fail the task.",
+          "Build coverage from appropriately handled representative traffic, curated edge cases, known incidents, synthetic cases for rare conditions, and adversarial probes. Keep a held-out set and avoid repeatedly tuning to every evaluation example. Respect privacy and retention when turning production cases into fixtures."
+        ]
+      },
+      {
+        "title": "Choose a grader that can measure the property",
+        "body": [],
+        "rows": [
+          [
+            "Code",
+            "Schema, exact identifiers, bounds, deterministic outcomes",
+            "Tests must reflect the actual requirement; passing an incomplete test is not proof of quality."
+          ],
+          [
+            "Model judge",
+            "Rubric-based interpretation at scale",
+            "Calibrate against human labels and inspect disagreement and bias."
+          ],
+          [
+            "Human expert",
+            "Novel or high-stakes judgment",
+            "Define criteria and adjudication, and measure disagreement where practical."
+          ]
+        ],
+        "headers": [
+          "Method",
+          "Fits",
+          "Limitation"
+        ]
+      },
+      {
+        "title": "Test more than the final response",
+        "body": [
+          "Agent traces reveal the path taken, while outcome checks reveal whether the intended work happened. Run repeated trials when variability matters. A correct final answer reached through an unauthorized action is not an acceptable success.",
+          "Test integrations under malformed inputs, partial failures, timeout conditions, and missing evidence. Load tests answer a different question from semantic graders: whether the service meets performance targets under the expected traffic shape. Monitor tail latency instead of relying only on an average."
+        ]
+      },
+      {
+        "title": "Run interpretable A/B tests",
+        "body": [
+          "Establish that both variants satisfy offline quality and safety gates before exposing live traffic. Randomize eligible traffic with a stable assignment unit, such as user or session, to avoid unintended cross-treatment effects. Define the primary outcome and guardrails before running the experiment.",
+          "Hold other components steady when estimating a prompt’s effect. If the retrieval index changes only for the new prompt, the experiment cannot attribute the difference cleanly. Define the analysis window, sample needs, and stopping rules; do not stop opportunistically after a favorable interval. Review important subgroups as well as aggregate results."
+        ]
+      },
+      {
+        "title": "Optimize the complete task",
+        "body": [
+          "Cost per completed task includes all model calls, tool work, retries, and failed attempts needed to achieve useful output. Reducing one request’s token bill can still increase total cost if the system takes more turns or fails more often.",
+          "Worked example: configuration A costs $0.04 per attempt and succeeds on 80 of 100 one-attempt tasks. Its total $4 spend divided by 80 successes is $0.05 per success in that experiment. Configuration B costs $0.045 per attempt and succeeds on 95, yielding about $0.0474 per success. These fictional figures illustrate a denominator; they are not provider prices."
+        ]
+      },
+      {
+        "title": "Convert incidents into durable checks",
+        "body": [
+          "Diagnose from the observed change and trace. Wrong source versions implicate retrieval; a volatile cached prefix implicates reuse; tool failures implicate the execution path. These are hypotheses supported by evidence, not rules that eliminate every alternative cause.",
+          "Add the failing case to the evaluation set with an appropriate privacy treatment. Run the regression suite after the fix, monitor a limited rollout, and preserve rollback. Model upgrades should pass the same task-specific quality and operational gates as prompt and architecture changes."
+        ]
+      }
+    ]
+  },
+  {
+    "id": "domain-5",
+    "title": "Governance, safety & risk",
+    "subtitle": "Place each control where it can prevent the failure.",
+    "domain": 5,
+    "minutes": 3,
+    "refs": [
+      "safety",
+      "hipaa",
+      "erasure",
+      "fedramp"
+    ],
+    "sections": [
+      {
+        "title": "Layer controls with distinct responsibilities",
+        "body": [
+          "Input checks identify requests or content that need special handling. System instructions define the model’s task and boundaries. Tool authorization constrains executable actions. Output validation checks the result before delivery. Human review handles designated decisions, and monitoring catches patterns after deployment.",
+          "A downstream check cannot undo a write that already happened. If policy requires approval before an account is modified, enforce it before the modification. If a mandatory checker is unavailable, the sensitive operation should be blocked or the application should enter a specifically approved restricted mode."
+        ]
+      },
+      {
+        "title": "Treat untrusted content as data",
+        "body": [
+          "Retrieved pages, emails, documents, and tool output may contain instructions. Their inclusion in context does not authorize them to redefine the user’s goal or grant access. Use explicit boundaries and least-privilege execution to reduce the impact of an instruction-following failure.",
+          "Grounding has two separate checks: a cited source must exist, and it must support the claim. A valid URL alone is insufficient. Define an insufficient-evidence behavior and allow escalation. The ability to decline an unsupported answer is part of the product contract."
+        ]
+      },
+      {
+        "title": "Calibrate human review",
+        "body": [
+          "Route review using the cost of error, reversibility, impact, and appropriately calibrated uncertainty. A low-risk read and a high-impact write need not have identical approval requirements. Blanket review can encourage rubber-stamping; unreviewed consequential actions can exceed the risk budget.",
+          "Reviewers need evidence, clear criteria, and authority to intervene. Audit a sample of automatically handled cases and measure whether the automation boundary remains appropriate. Do not treat a model’s confident wording as a calibrated confidence score."
+        ]
+      },
+      {
+        "title": "Map obligations to the actual system",
+        "body": [],
+        "rows": [
+          [
+            "HIPAA / ePHI",
+            "Verify the applicable BAA and assess safeguards and actual cloud data flows with the responsible team. Physician review does not replace these requirements."
+          ],
+          [
+            "UK GDPR erasure",
+            "Track relevant copies and processors; implement the approved erasure process with applicable exceptions and documented backup treatment. Erasure is not an absolute right."
+          ],
+          [
+            "FedRAMP",
+            "Verify evidence for the specific cloud offering and the agency’s intended use, configuration, integrations, and customer responsibilities. A vendor-level slogan is insufficient."
+          ]
+        ],
+        "headers": [
+          "Area",
+          "Architecture question"
+        ]
+      },
+      {
+        "title": "Bias, fairness, and transparency",
+        "body": [
+          "Choose the relevant outcome and population before defining a fairness test. Aggregate accuracy can hide unequal error patterns. Where appropriate and lawful, evaluate across relevant groups, examine false-positive and false-negative costs, and investigate gaps rather than assuming a single metric establishes fairness.",
+          "Document intended use, limitations, and accountable human decisions. Continue monitoring after deployment because changing traffic or data can alter the risk profile. Governance evidence should connect each requirement to a control, an owner, a test, and a retained artifact.",
+          "The compliance examples here are architecture study prompts, not a claim that a model or product is automatically compliant. Confirm the applicable jurisdiction and current deployment terms with the responsible reviewers."
+        ]
+      }
+    ]
+  },
+  {
+    "id": "domain-6",
+    "title": "Stakeholders & lifecycle",
+    "subtitle": "Deliver a system people can approve, use, and operate.",
+    "domain": 6,
+    "minutes": 3,
+    "refs": [
+      "lifecycle"
+    ],
+    "sections": [
+      {
+        "title": "Run discovery with the actual stakeholders",
+        "body": [
+          "Include the sponsor, end users, data owners, security, legal or compliance where relevant, operations, and finance. Each contributes a constraint or acceptance decision. Discovering a blocking data restriction after the build is expensive; identifying it early gives the design a chance to address it.",
+          "Ask for real examples of today’s work and at least one failure case. Establish volume, current performance, the cost of mistakes, required approvers, and the conditions that would cause the system to be stopped. Convert “better support” into observable outcomes and boundaries."
+        ]
+      },
+      {
+        "title": "Choose a pilot that can produce evidence",
+        "body": [
+          "Favor a bounded use case with accessible data, a measurable baseline, engaged ownership, and manageable risk. Business value still matters; a pilot should test a useful hypothesis. Visibility and technical novelty alone are not sufficient selection criteria.",
+          "Define what must be true before expanding the audience. Include task results, operational readiness, user feedback, cost, and safety guardrails. Record the decision to continue, change direction, or stop. A pilot that exposes a flawed assumption can be valuable evidence."
+        ]
+      },
+      {
+        "title": "Explain and record trade-offs",
+        "body": [
+          "An architectural recommendation should state the relevant options, the evidence for choosing one, and its consequences. Make assumptions explicit. A stakeholder should understand what the chosen option improves, what it costs, and what would cause you to revisit it.",
+          "An architecture decision record preserves context, considered alternatives, the decision, rationale, and consequences. It answers why a design exists. A runbook instead explains how to operate or recover it; both are needed at handoff."
+        ]
+      },
+      {
+        "title": "Agree on measurable service expectations",
+        "body": [
+          "Define the population, measurement window, success criteria, and behavior outside the target. For latency, an end-to-end p95 or p99 measure can expose slow cases hidden by the mean. Distinguish an internal service-level objective from a contractual SLA.",
+          "Communicate that generative outputs can vary. Promise the measured behavior and the handling of failures rather than asserting that identical inputs always produce identical outputs. Include dependencies and degraded operation in the service design."
+        ]
+      },
+      {
+        "title": "Make handoff a practiced transition",
+        "body": [],
+        "rows": [
+          [
+            "Runbook",
+            "Known symptom → checks → recovery → verification."
+          ],
+          [
+            "Evaluation suite",
+            "The agreed evidence that a proposed change is acceptable."
+          ],
+          [
+            "Dashboards and alerts",
+            "Health signals, actionable thresholds, and named responders."
+          ],
+          [
+            "Escalation path",
+            "Who takes over, at what point, with what incident context."
+          ],
+          [
+            "Decision records",
+            "Why the system was built this way and which assumptions may expire."
+          ]
+        ],
+        "headers": [
+          "Artifact",
+          "Purpose"
+        ]
+      },
+      {
+        "title": "Close the adoption and feedback loop",
+        "body": [
+          "Have the receiving team perform real operating tasks and recovery exercises while support is still available. Check that they have the required permissions and can use the artifacts. A document delivery does not demonstrate operational readiness.",
+          "When adoption is low, diagnose workflow fit, training, trust, and user feedback before adding features. Feed incidents and corrections into a maintained backlog and evaluation suite. Review the resulting improvements against the same business goals used to justify the system."
+        ]
+      }
+    ]
+  },
+  {
+    "id": "domain-7",
+    "title": "Developer productivity & enablement",
+    "subtitle": "Create shared practices that outlast the first champion.",
+    "domain": 7,
+    "minutes": 3,
+    "refs": [
+      "teams",
+      "memory",
+      "plugins",
+      "headless"
+    ],
+    "sections": [
+      {
+        "title": "Distinguish guidance from enforcement",
+        "body": [
+          "Use project CLAUDE.md for shared conventions and commands. Put module-specific guidance in scoped rules or nested files and remove contradictions. Files are added to context; do not assume conflicting instructions have guaranteed “most specific wins” semantics.",
+          "Use enforced permissions or appropriate hooks when a prohibited operation must be blocked. A sentence in a prompt is not equivalent to a technical control. Keep credentials out of repository instructions."
+        ]
+      },
+      {
+        "title": "Distribute maintainable capabilities",
+        "body": [
+          "Package shared extensions as versioned plugins when several codebases need common capabilities. Document installation, supported environments, ownership, and the update process. Test upgrades before broad rollout and retain a recoverable prior configuration.",
+          "A repository-scoped skill can fit a procedure maintained alongside one project. Choose the distribution mechanism from the actual scope rather than copying unmanaged personal configurations into every team. Set model and spend expectations as part of enablement."
+        ]
+      },
+      {
+        "title": "Automate deliberately",
+        "body": [
+          "For unattended Claude Code work, use the programmatic interface and parseable output. Configure supported authentication, permissions, and timeouts for the environment. Avoid a CI task that waits for terminal interaction nobody can provide.",
+          "Treat generated code as a change a human team owns. Tests should cover requirements and important failure cases; reviewers should examine security, maintainability, and whether the author can explain the implementation and its limits. Passing a formatter is not evidence of behavioral correctness."
+        ]
+      },
+      {
+        "title": "Build operational independence",
+        "body": [
+          "Start with a representative workflow in the team’s own repository. Enable a champion, collect evidence of useful work, and expand with feedback and clear support. Giving everyone access is only one part of adoption.",
+          "Convert recurring problems into runbooks and assign escalation ownership. The team should be able to solve familiar incidents without relying on one expert. Rehearse operation and recovery before the architect or champion steps away."
+        ]
+      }
+    ]
+  },
+  {
+    "id": "quick-review",
+    "title": "Decision checklist",
+    "subtitle": "A final pass through the boundaries that matter.",
+    "domain": 0,
+    "minutes": 3,
+    "refs": [
+      "design",
+      "integration",
+      "safety",
+      "lifecycle",
+      "teams"
+    ],
+    "sections": [
+      {
+        "title": "Read the scenario in this order",
+        "body": [
+          "Identify the goal and the binding constraint. Determine what changed, what evidence was observed, and where the failure happens. Choose the control that addresses that cause at the correct boundary.",
+          "Ask whether an option changes capability, changes information, measures behavior, or merely describes desired behavior. A prompt warning is not an access check; an audit after a write is not authorization before it."
+        ]
+      },
+      {
+        "title": "Architecture and context",
+        "body": [],
+        "rows": [
+          [
+            "Known sequence",
+            "Workflow with stage contracts."
+          ],
+          [
+            "Dynamic subtasks",
+            "Bounded orchestration with task-level coverage."
+          ],
+          [
+            "Stable repeated prefix",
+            "Caching, with measured hits."
+          ],
+          [
+            "Old bulky results",
+            "Editing or compaction according to what must survive."
+          ],
+          [
+            "Large inactive tool catalog",
+            "Role scoping and measured tool discovery."
+          ]
+        ],
+        "headers": [
+          "Clue",
+          "Candidate response"
+        ]
+      },
+      {
+        "title": "Integration and evaluation",
+        "body": [],
+        "rows": [
+          [
+            "Cross-tenant data risk",
+            "Trusted identity plus authorization before context or action."
+          ],
+          [
+            "Exact codes and concepts",
+            "Compare lexical, dense, and hybrid retrieval."
+          ],
+          [
+            "Wrong answers after refresh",
+            "Inspect source versions, chunks, and index behavior."
+          ],
+          [
+            "Cheaper requests but more retries",
+            "Measure cost per successful completed task."
+          ],
+          [
+            "Aggregate improvement",
+            "Check important segments and other acceptance gates."
+          ]
+        ],
+        "headers": [
+          "Clue",
+          "Candidate response"
+        ]
+      },
+      {
+        "title": "Governance and lifecycle",
+        "body": [],
+        "rows": [
+          [
+            "Mandatory safety check unavailable",
+            "Block sensitive action or use approved restricted mode."
+          ],
+          [
+            "High-impact action",
+            "Pre-execution approval and accountable review."
+          ],
+          [
+            "Late approval blocker",
+            "Bring required reviewers into discovery."
+          ],
+          [
+            "Low adoption",
+            "Diagnose fit, training, trust, and feedback."
+          ],
+          [
+            "Handoff",
+            "Have the receiving team demonstrate operation and recovery."
+          ]
+        ],
+        "headers": [
+          "Clue",
+          "Candidate response"
+        ]
+      },
+      {
+        "title": "Before you submit the mock",
+        "body": [
+          "Check all flagged and incomplete items. Select-two answers need exactly two choices. Matching exercises require all six rows. In timed mode, the clock continues through reloads and time away from the page.",
+          "Use the results as a study map. The mock’s raw accuracy does not predict a scaled certification result, and seeing the same bank again measures familiarity as well as understanding."
+        ]
+      }
+    ]
+  },
+  {
+    "id": "glossary",
+    "title": "Architecture glossary",
+    "subtitle": "Terms you should be able to explain through an example.",
+    "domain": 0,
+    "minutes": 3,
+    "refs": [
+      "design",
+      "integration",
+      "lifecycle",
+      "teams"
+    ],
+    "sections": [
+      {
+        "title": "Systems and integration",
+        "body": [],
+        "rows": [
+          [
+            "Agent",
+            "A system that lets a model dynamically choose actions within a controlled loop."
+          ],
+          [
+            "Workflow",
+            "A defined sequence or control path, potentially containing model calls."
+          ],
+          [
+            "RAG",
+            "Retrieval-augmented generation: select external evidence for a generated response."
+          ],
+          [
+            "MCP",
+            "Model Context Protocol: a standard interface for connecting compatible AI clients to tools and data."
+          ],
+          [
+            "Authentication",
+            "Establishing identity."
+          ],
+          [
+            "Authorization",
+            "Determining permitted actions on resources."
+          ],
+          [
+            "Idempotency",
+            "A property that repeated execution has the same intended effect as one execution."
+          ],
+          [
+            "Trace",
+            "A correlated record of execution steps and outcomes."
+          ]
+        ],
+        "headers": [
+          "Term",
+          "Meaning"
+        ]
+      },
+      {
+        "title": "Context and evaluation",
+        "body": [],
+        "rows": [
+          [
+            "Prompt caching",
+            "Reuse of computation for a repeated prompt prefix."
+          ],
+          [
+            "Compaction",
+            "Condensing history while preserving needed state."
+          ],
+          [
+            "Few-shot prompting",
+            "Using examples to demonstrate desired behavior."
+          ],
+          [
+            "Grader",
+            "Logic or a reviewer that assesses a defined property of an output or outcome."
+          ],
+          [
+            "Calibration",
+            "Checking a measurement or judge against an accepted reference."
+          ],
+          [
+            "Regression",
+            "Previously acceptable behavior degrades after a change."
+          ],
+          [
+            "p95 latency",
+            "The value at or below which 95% of measured latencies fall for the defined sample."
+          ],
+          [
+            "A/B test",
+            "A controlled comparison of variants, ordinarily with random assignment."
+          ]
+        ],
+        "headers": [
+          "Term",
+          "Meaning"
+        ]
+      },
+      {
+        "title": "Governance and operations",
+        "body": [],
+        "rows": [
+          [
+            "Least privilege",
+            "Only the capabilities and access needed for the role or task."
+          ],
+          [
+            "Fail closed",
+            "Withhold a protected operation when a required authorization or control cannot be established."
+          ],
+          [
+            "Human in the loop",
+            "A defined human decision or validation step in the operating process."
+          ],
+          [
+            "ADR",
+            "Architecture decision record: context, options, decision, reasons, and consequences."
+          ],
+          [
+            "SLO",
+            "A defined service-level objective used to measure a service."
+          ],
+          [
+            "SLA",
+            "An agreement about service levels and applicable commitments."
+          ],
+          [
+            "Runbook",
+            "Actionable diagnosis and recovery instructions."
+          ],
+          [
+            "Escalation path",
+            "Named ownership and criteria for transferring an issue."
+          ]
+        ],
+        "headers": [
+          "Term",
+          "Meaning"
+        ]
+      }
+    ]
+  }
+]

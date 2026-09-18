@@ -1,0 +1,88 @@
+{
+  "blueprint": {
+    "title": "Exam Guide v1.0 · July 2026, sections 5–6 and 9",
+    "url": "https://anthropic-partners.skilljar.com/path/claude-certified-architect-professional",
+    "note": "Blueprint transcribed from the user-supplied official PDF. The Academy is the access point; the PDF is not redistributed."
+  },
+  "design": {
+    "title": "Anthropic Academy · Claude Platform & Solution Design",
+    "url": "https://anthropic-partners.skilljar.com/path/claude-certified-architect-professional/claude-platform-solution-design",
+    "note": "Authenticated course verified in the owner’s Chrome session; study summaries also draw on the owner’s notes."
+  },
+  "integration": {
+    "title": "Anthropic Academy · Enterprise Integration & Production",
+    "url": "https://anthropic-partners.skilljar.com/path/claude-certified-architect-professional/enterprise-integration-production",
+    "note": "Course listing verified; explanations synthesize the owner’s course notes."
+  },
+  "safety": {
+    "title": "Anthropic Academy · Responsible AI, Safety & Risk",
+    "url": "https://anthropic-partners.skilljar.com/path/claude-certified-architect-professional/responsible-ai-safety-risk-for-architects",
+    "note": "Course listing verified; explanations synthesize the owner’s course notes."
+  },
+  "lifecycle": {
+    "title": "Anthropic Academy · Stakeholder Engagement, Lifecycle & GTM",
+    "url": "https://anthropic-partners.skilljar.com/path/claude-certified-architect-professional/stakeholder-engagement-lifecycle-gtm",
+    "note": "Course listing verified; explanations synthesize the owner’s course notes."
+  },
+  "teams": {
+    "title": "Anthropic Academy · Team Enablement & Operational Productivity",
+    "url": "https://anthropic-partners.skilljar.com/path/claude-certified-architect-professional/developer-productivity-enablement",
+    "note": "Course listing verified; explanations synthesize the owner’s course notes."
+  },
+  "agents": {
+    "title": "Anthropic · Building effective agents",
+    "url": "https://www.anthropic.com/engineering/building-effective-agents"
+  },
+  "evals": {
+    "title": "Anthropic · Demystifying evals for AI agents",
+    "url": "https://www.anthropic.com/engineering/demystifying-evals-for-ai-agents"
+  },
+  "cache": {
+    "title": "Claude Platform · Prompt caching",
+    "url": "https://platform.claude.com/docs/en/build-with-claude/prompt-caching"
+  },
+  "tools": {
+    "title": "Claude Platform · Tool use with Claude",
+    "url": "https://platform.claude.com/docs/en/agents-and-tools/tool-use/overview"
+  },
+  "context": {
+    "title": "Claude Platform · Manage tool context",
+    "url": "https://platform.claude.com/docs/en/agents-and-tools/tool-use/manage-tool-context"
+  },
+  "thinking": {
+    "title": "Claude Platform · Thinking",
+    "url": "https://platform.claude.com/docs/en/about-claude/models/extended-thinking-models"
+  },
+  "rag": {
+    "title": "Anthropic · Contextual retrieval",
+    "url": "https://www.anthropic.com/engineering/contextual-retrieval"
+  },
+  "batch": {
+    "title": "Claude Platform · Batch processing",
+    "url": "https://platform.claude.com/docs/en/build-with-claude/batch-processing"
+  },
+  "memory": {
+    "title": "Claude Code · How Claude remembers your project",
+    "url": "https://code.claude.com/docs/en/memory"
+  },
+  "plugins": {
+    "title": "Claude Code · Create plugins",
+    "url": "https://code.claude.com/docs/en/plugins"
+  },
+  "headless": {
+    "title": "Claude Code · Run Claude Code programmatically",
+    "url": "https://code.claude.com/docs/en/headless"
+  },
+  "hipaa": {
+    "title": "US HHS · Guidance on HIPAA & cloud computing",
+    "url": "https://www.hhs.gov/hipaa/for-professionals/special-topics/health-information-technology/cloud-computing/index.html"
+  },
+  "erasure": {
+    "title": "UK ICO · Right to erasure",
+    "url": "https://ico.org.uk/for-organisations/uk-gdpr-guidance-and-resources/individual-rights/individual-rights/right-to-erasure/"
+  },
+  "fedramp": {
+    "title": "FedRAMP · Using a FedRAMP Certified Cloud Service",
+    "url": "https://www.fedramp.gov/2026/agencies/use/"
+  }
+}

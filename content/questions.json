@@ -1,0 +1,1608 @@
+[
+  {
+    "id": 1,
+    "domain": 1,
+    "q": "An insurer wants Claude to determine claim eligibility. A rules engine already computes eligibility correctly and produces an audit trail regulators accept. What should the architecture do with the rules engine?",
+    "choices": [
+      "Keep it as the source of truth and have Claude call it, using Claude to gather inputs and explain the outcome",
+      "Replace it with a prompt that encodes the same rules, so eligibility logic lives in one place",
+      "Run both and have Claude reconcile disagreements between itself and the rules engine",
+      "Use the rules engine only as a fallback when Claude's confidence is low"
+    ],
+    "answer": [
+      0
+    ],
+    "why": "The ownership split assigns to existing systems anything the client has already paid to make reliable. The rules engine is deterministic, correct, and auditable — three properties a prompt cannot match. Claude adds value at the edges: gathering messy inputs and explaining the determination in language. Replacing it trades an auditable system for a non-deterministic one; reconciling or falling back still puts a non-deterministic component in the decision path.",
+    "type": "single",
+    "refs": [
+      "design"
+    ],
+    "objective": "Business problem translation",
+    "chapter": "domain-1",
+    "origin": "Original practice scenario; adapted and reviewed from the owner’s study notes."
+  },
+  {
+    "id": 2,
+    "domain": 1,
+    "q": "A document-processing workflow has five steps that are the same for every document, in the same order, each with a checkable output. The team proposes an agent that decides which step to run next. What is the strongest objection?",
+    "choices": [
+      "Use a fixed workflow with checks between the known steps",
+      "Let an orchestrator rediscover the same five steps for every document",
+      "Run five independent agents without passing intermediate outputs",
+      "Put all five steps in one prompt and remove intermediate validation"
+    ],
+    "answer": [
+      0
+    ],
+    "why": "The sequence is already specified. A workflow makes its intermediate contracts and failures easier to inspect. An orchestrator adds a routing decision that this requirement does not need; independent agents lose dependencies; one unchecked prompt loses the stage gates.",
+    "type": "single",
+    "refs": [
+      "agents"
+    ],
+    "objective": "Architectural pattern selection",
+    "chapter": "domain-1",
+    "origin": "Original practice scenario; adapted and reviewed from the owner’s study notes."
+  },
+  {
+    "id": 3,
+    "domain": 1,
+    "q": "An investigation has an unknown number of follow-up steps. Errors can be detected and corrected before any external action. Which TWO considerations support an agentic design?",
+    "choices": [
+      "The next useful step depends on evidence found during execution",
+      "The expected benefit justifies the additional latency and operating cost",
+      "The task can be reduced to a fixed sequence with no runtime decisions",
+      "Autonomy eliminates the need for stop conditions",
+      "A larger model removes the need to validate tool outputs",
+      "High request volume alone proves an agent is appropriate"
+    ],
+    "answer": [
+      0,
+      1
+    ],
+    "why": "Dynamic sequencing is a reason to consider an agent. The added autonomy must also earn its cost. Fixed steps favor workflows; volume does not establish task fit, and validation and termination remain necessary.",
+    "type": "multi",
+    "refs": [
+      "agents"
+    ],
+    "objective": "Agentic design trade-offs",
+    "chapter": "domain-1",
+    "origin": "Original practice scenario; adapted and reviewed from the owner’s study notes."
+  },
+  {
+    "id": 4,
+    "domain": 1,
+    "q": "A multi-agent research system dispatched eight subagents. One timed out. The orchestrator produced a fluent, confident summary that silently omitted that subagent's topic. Which change most directly prevents recurrence?",
+    "choices": [
+      "Track a result or explicit failure for each dispatched task ID, retry or disclose unresolved gaps before synthesis",
+      "Increase the subagent timeout so slow subagents have more time",
+      "Instruct the orchestrator in its system prompt to mention when information is missing",
+      "Use a more capable model for the orchestrator so it notices the omission"
+    ],
+    "answer": [
+      0
+    ],
+    "why": "Track task identity and completion status, not just result counts: duplicates could otherwise hide a missing topic. This creates an explicit recovery path. A longer timeout or a more capable model does not establish coverage.",
+    "type": "single",
+    "refs": [
+      "design"
+    ],
+    "objective": "Multi-agent orchestration",
+    "chapter": "domain-1",
+    "origin": "Original practice scenario; adapted and reviewed from the owner’s study notes."
+  },
+  {
+    "id": 5,
+    "domain": 1,
+    "q": "A retailer currently cannot offer support outside business hours because it cannot staff overnight multilingual coverage. A Claude system now handles those hours. Which business value pillar does this primarily serve?",
+    "choices": [
+      "Transformation",
+      "Efficiency",
+      "Cost",
+      "Productivity"
+    ],
+    "answer": [
+      0
+    ],
+    "why": "Transformation means making possible something that was not possible before. Efficiency and cost describe doing existing work faster or cheaper; productivity means more output from the same people. Here the capability itself is new — the coverage did not exist at any price the retailer would pay.",
+    "type": "single",
+    "refs": [
+      "design"
+    ],
+    "objective": "Business value alignment",
+    "chapter": "domain-1",
+    "origin": "Original practice scenario; adapted and reviewed from the owner’s study notes."
+  },
+  {
+    "id": 6,
+    "domain": 1,
+    "q": "Why is a single successful end-to-end test insufficient evidence that a Claude system is ready for production?",
+    "choices": [
+      "The system is non-deterministic — the same input can yield different outputs across runs, so one observation does not characterize behavior",
+      "Production traffic always has higher volume than test traffic",
+      "Test environments use a different model than production",
+      "Latency in testing is never representative of production"
+    ],
+    "answer": [
+      0
+    ],
+    "why": "Non-determinism is the platform property that makes evaluation frameworks mandatory rather than optional. You need a distribution of graded cases, not an anecdote. The other options describe real operational concerns but none of them is the reason a single pass proves nothing.",
+    "type": "single",
+    "refs": [
+      "evals"
+    ],
+    "objective": "End-to-end system design",
+    "chapter": "domain-1",
+    "origin": "Original practice scenario; adapted and reviewed from the owner’s study notes."
+  },
+  {
+    "id": 7,
+    "domain": 1,
+    "q": "An orchestrator passes its full conversation history — including its own brainstorming and working hypotheses — to a critic subagent whose job is to independently verify a claim. What is the architectural flaw?",
+    "choices": [
+      "It risks anchoring the critic on unverified hypotheses; pass the claim, relevant evidence, and criteria for an independent check",
+      "Passing history exceeds the context window in most cases",
+      "Subagents are not permitted to receive assistant-role messages",
+      "The critic will run more slowly than necessary"
+    ],
+    "answer": [
+      0
+    ],
+    "why": "Separate evidence from the earlier agent’s hypotheses. Context isolation can reduce anchoring; it does not guarantee independent or correct judgment. The review still needs explicit criteria and access to evidence.",
+    "type": "single",
+    "refs": [
+      "design"
+    ],
+    "objective": "Multi-agent orchestration",
+    "chapter": "domain-1",
+    "origin": "Original practice scenario; adapted and reviewed from the owner’s study notes."
+  },
+  {
+    "id": 8,
+    "domain": 1,
+    "q": "A client-tool response has stop_reason=\"tool_use\". The application displays its accompanying text as the final answer and never executes the requested tool. What must the application do?",
+    "choices": [
+      "The loop does not branch on stop_reason, so a tool_use response is never executed and its result never returned to the model",
+      "The tools are described too vaguely for the model to select correctly",
+      "The model needs a larger context window to hold the tool definitions",
+      "Temperature is set too high for a support use case"
+    ],
+    "answer": [
+      0
+    ],
+    "why": "For client tools, the application handles tool_use, executes authorized calls, returns matching tool_result blocks, and continues the conversation. Rendering the first response as complete skips that loop. Validate inputs and permissions before executing a requested action.",
+    "type": "single",
+    "refs": [
+      "tools"
+    ],
+    "objective": "End-to-end tool execution",
+    "chapter": "domain-1",
+    "origin": "Original practice scenario; adapted and reviewed from the owner’s study notes."
+  },
+  {
+    "id": 9,
+    "domain": 1,
+    "q": "Which decomposition seam is most appropriate when a task has a routine high-volume majority and a difficult minority that needs deeper reasoning?",
+    "choices": [
+      "Route using measured task difficulty or a calibrated confidence signal, with a defined escalation path",
+      "Sequential: run every case through the same pipeline stages",
+      "Parallel fan-out: process all cases simultaneously",
+      "Specialization: assign each case type a differently-prompted agent regardless of difficulty"
+    ],
+    "answer": [
+      0
+    ],
+    "why": "A routing boundary can reserve the expensive path for harder cases. Validate the routing signal on representative cases; a model’s self-reported confidence is not automatically calibrated.",
+    "type": "single",
+    "refs": [
+      "design"
+    ],
+    "objective": "Problem decomposition",
+    "chapter": "domain-1",
+    "origin": "Original practice scenario; adapted and reviewed from the owner’s study notes."
+  },
+  {
+    "id": 10,
+    "domain": 1,
+    "q": "An operations sponsor requests an AI assistant. Which TWO discovery questions best establish scope before choosing a model?",
+    "choices": [
+      "What work happens today, at what volume, and with what baseline performance?",
+      "Which failures would require escalation or shutting the system down?",
+      "Which model name should we put in the proposal?",
+      "How many agents would make the demo look sophisticated?",
+      "Which interface color should be the default?",
+      "Can we postpone talking to operators until after launch?"
+    ],
+    "answer": [
+      0,
+      1
+    ],
+    "why": "The current process defines opportunity and baseline. Failure tolerance defines boundaries and controls. Product styling and model choice cannot substitute for these requirements.",
+    "type": "multi",
+    "refs": [
+      "design"
+    ],
+    "objective": "Business requirements",
+    "chapter": "domain-1",
+    "origin": "Original practice scenario; adapted and reviewed from the owner’s study notes."
+  },
+  {
+    "id": 11,
+    "domain": 1,
+    "q": "Match each workload to the most appropriate pattern. Use each pattern once.",
+    "why": "An augmented LLM combines a model with supporting capabilities. Chaining fixes the sequence, routing chooses a path, parallelization handles independent work, an orchestrator discovers subtasks, and an evaluator loop improves an artifact against criteria.",
+    "type": "match",
+    "labels": [
+      "Augmented LLM",
+      "Prompt chaining",
+      "Routing",
+      "Parallelization",
+      "Orchestrator–workers",
+      "Evaluator–optimizer"
+    ],
+    "rows": [
+      {
+        "text": "Answer a question using retrieved context in a single generation step",
+        "answer": 0
+      },
+      {
+        "text": "Draft, validate, then translate a document through a known sequence",
+        "answer": 1
+      },
+      {
+        "text": "Direct a request to a billing or technical-support specialist",
+        "answer": 2
+      },
+      {
+        "text": "Assess independent sections simultaneously and aggregate their findings",
+        "answer": 3
+      },
+      {
+        "text": "Discover subtasks at runtime, delegate them, and synthesize results",
+        "answer": 4
+      },
+      {
+        "text": "Revise a draft repeatedly using explicit review criteria until an exit condition",
+        "answer": 5
+      }
+    ],
+    "refs": [
+      "agents"
+    ],
+    "objective": "Architectural pattern selection",
+    "chapter": "domain-1",
+    "origin": "Original practice scenario; adapted and reviewed from the owner’s study notes."
+  },
+  {
+    "id": 12,
+    "domain": 2,
+    "q": "A help-desk assistant repeatedly sends a stable product handbook before each new ticket. How should the team reduce repeated-prefix processing cost without removing required handbook content?",
+    "choices": [
+      "Place the stable handbook in a cacheable prefix before variable ticket data",
+      "Insert the ticket identifier before the handbook in the cached prefix",
+      "Delete every second handbook paragraph to reduce tokens",
+      "Replace the handbook with a statement that the assistant knows the products"
+    ],
+    "answer": [
+      0
+    ],
+    "why": "Keep the reusable prefix stable and put changing ticket data after it. Caching reuses prefix computation; it does not remove the handbook from the context. Check supported minimum lengths and cache usage.",
+    "type": "single",
+    "refs": [
+      "cache"
+    ],
+    "objective": "Prompt reuse and caching",
+    "chapter": "domain-2",
+    "origin": "Original practice scenario; adapted and reviewed from the owner’s study notes."
+  },
+  {
+    "id": 13,
+    "domain": 2,
+    "q": "A cached prefix meets the selected model’s minimum length, and requests repeat within the cache lifetime. Cache reads still miss. Which change best explains this?",
+    "choices": [
+      "The system prompt includes a current timestamp, changing the prefix on every request",
+      "The user messages are too short to benefit from caching",
+      "The account has exceeded its cache storage quota",
+      "Caching only applies to requests that use tools"
+    ],
+    "answer": [
+      0
+    ],
+    "why": "A changing timestamp inside the reusable region prevents an exact prefix match. Move volatile fields after the cache breakpoint. Minimum lengths and lifetime also matter, but the scenario has already checked those.",
+    "type": "single",
+    "refs": [
+      "cache"
+    ],
+    "objective": "Prompt reuse and caching",
+    "chapter": "domain-2",
+    "origin": "Original practice scenario; adapted and reviewed from the owner’s study notes."
+  },
+  {
+    "id": 14,
+    "domain": 2,
+    "q": "A team is choosing a Claude model for a document classification service. What evidence should decide the choice?",
+    "choices": [
+      "Representative task evaluations against required quality, latency, and cost limits",
+      "The highest score on an unrelated public coding benchmark",
+      "The model with the largest context window, regardless of document size",
+      "The newest model name, without testing the application"
+    ],
+    "answer": [
+      0
+    ],
+    "why": "Model choice follows measured fit to the workload and its constraints. Public benchmarks can inform a shortlist but do not establish performance on the team’s own distribution.",
+    "type": "single",
+    "refs": [
+      "design"
+    ],
+    "objective": "Model selection trade-offs",
+    "chapter": "domain-2",
+    "origin": "Original practice scenario; adapted and reviewed from the owner’s study notes."
+  },
+  {
+    "id": 15,
+    "domain": 2,
+    "q": "A latency-sensitive route uses a model that supports effort controls. Token hygiene is already in place. Which is a useful controlled experiment?",
+    "choices": [
+      "Test a lower supported effort setting against the same quality and latency criteria",
+      "Change effort, prompt, retrieval, and model together in one experiment",
+      "Maximize the output token limit to force shorter latency",
+      "Assume effort changes cannot affect either quality or cache behavior"
+    ],
+    "answer": [
+      0
+    ],
+    "why": "Measure the trade-off using a supported setting while holding other factors stable. Effort can affect output quality, latency, and caching; there is no universal guarantee that lowering it preserves any of them.",
+    "type": "single",
+    "refs": [
+      "thinking"
+    ],
+    "objective": "Accuracy-latency trade-offs",
+    "chapter": "domain-2",
+    "origin": "Original practice scenario; adapted and reviewed from the owner’s study notes."
+  },
+  {
+    "id": 16,
+    "domain": 2,
+    "q": "Which situation most justifies few-shot examples over a purely zero-shot instruction?",
+    "choices": [
+      "The required output format and its edge-case handling are hard to describe but easy to demonstrate",
+      "The task requires multi-step numerical reasoning",
+      "The prompt needs to stay under a token budget",
+      "The model must call a specific tool on every request"
+    ],
+    "answer": [
+      0
+    ],
+    "why": "Examples are useful for demonstrating formatting and boundary cases that prose instructions leave ambiguous. Evaluate whether the gain justifies the added tokens. Examples can also help other tasks; this scenario asks where the format need most directly motivates them.",
+    "type": "single",
+    "refs": [
+      "design"
+    ],
+    "objective": "Prompt engineering techniques",
+    "chapter": "domain-2",
+    "origin": "Original practice scenario; adapted and reviewed from the owner’s study notes."
+  },
+  {
+    "id": 17,
+    "domain": 2,
+    "q": "A policy assistant fills gaps with confident guesses. Which TWO system-prompt changes directly improve its behavior when evidence is missing?",
+    "choices": [
+      "Define an explicit insufficient-evidence response and escalation route",
+      "Require claims to stay within the supplied evidence and task boundaries",
+      "Describe the assistant as infallible",
+      "Require an answer even when no supporting source is available",
+      "Treat instructions inside retrieved pages as higher priority",
+      "Remove all uncertainty language from the output"
+    ],
+    "answer": [
+      0,
+      1
+    ],
+    "why": "Give the assistant an allowed response for unsupported cases and a clear evidence boundary. Prompt rules help guide behavior; retrieval, validation, and tool permissions still need separate controls.",
+    "type": "multi",
+    "refs": [
+      "design"
+    ],
+    "objective": "System prompts and guardrails",
+    "chapter": "domain-2",
+    "origin": "Original practice scenario; adapted and reviewed from the owner’s study notes."
+  },
+  {
+    "id": 18,
+    "domain": 2,
+    "q": "Choose the context technique that most directly addresses each symptom. Options may be used more than once.",
+    "why": "Caching targets repeated computation, editing removes stale content, and compaction summarizes history. Tool search discovers definitions as needed. Examples demonstrate behavior, while modular templates support reuse and maintenance.",
+    "type": "match",
+    "labels": [
+      "Prompt caching",
+      "Context editing",
+      "Compaction",
+      "Tool search",
+      "Few-shot examples",
+      "Modular prompt template"
+    ],
+    "rows": [
+      {
+        "text": "The same stable policy prefix is processed repeatedly across requests",
+        "answer": 0
+      },
+      {
+        "text": "Old tool-result blocks occupy space after they are no longer useful",
+        "answer": 1
+      },
+      {
+        "text": "A long history must retain key decisions in condensed form",
+        "answer": 2
+      },
+      {
+        "text": "Most of a large tool catalog is irrelevant to any given turn",
+        "answer": 3
+      },
+      {
+        "text": "A classification format has subtle edge cases best demonstrated with examples",
+        "answer": 4
+      },
+      {
+        "text": "Several teams need the same maintained instruction sections with task variables",
+        "answer": 5
+      }
+    ],
+    "refs": [
+      "context",
+      "design"
+    ],
+    "objective": "Context and token management",
+    "chapter": "domain-2",
+    "origin": "Original practice scenario; adapted and reviewed from the owner’s study notes."
+  },
+  {
+    "id": 19,
+    "domain": 2,
+    "q": "An assistant has a large tool catalog and poor selection accuracy. Which TWO changes are reasonable to evaluate?",
+    "choices": [
+      "Expose only tools relevant to the active role or specialist",
+      "Use tool search to load relevant definitions on demand",
+      "Always place every full schema in every request",
+      "Grant all tools write access so the model has more choices",
+      "Treat tool count alone as proof that a universal numerical limit was crossed",
+      "Remove authorization because deferred tools are automatically safe"
+    ],
+    "answer": [
+      0,
+      1
+    ],
+    "why": "Role-specific exposure and deferred discovery can reduce the active selection surface. Tool search adds its own retrieval cost and failure modes; evaluate the trade-off. It does not supply authorization.",
+    "type": "multi",
+    "refs": [
+      "context"
+    ],
+    "objective": "Progressive discovery",
+    "chapter": "domain-2",
+    "origin": "Original practice scenario; adapted and reviewed from the owner’s study notes."
+  },
+  {
+    "id": 20,
+    "domain": 3,
+    "q": "A document-review assistant only needs to read project files and draft comments. Its tool catalog also includes repository deletion and billing changes. What is the strongest least-privilege adjustment?",
+    "choices": [
+      "Remove repository deletion and billing changes from this role’s tools",
+      "Keep all tools and add a warning in the welcome message",
+      "Only log deletion and billing calls after they happen",
+      "Use a more capable model with the same privileges"
+    ],
+    "answer": [
+      0
+    ],
+    "why": "Remove capabilities outside the role’s job and enforce the intended scope at execution. Warnings, logs, and model selection do not remove unnecessary authority.",
+    "type": "single",
+    "refs": [
+      "safety"
+    ],
+    "objective": "Capability bloat",
+    "chapter": "domain-3",
+    "origin": "Original practice scenario; adapted and reviewed from the owner’s study notes."
+  },
+  {
+    "id": 21,
+    "domain": 3,
+    "q": "An authenticated multi-tenant assistant executes every tool call through a broad service account. Which TWO changes address the authorization gap?",
+    "choices": [
+      "Carry a verified caller identity and tenant context to the tool boundary",
+      "Check resource-level permissions in the service before reading or modifying data",
+      "Let a prompt decide whether a user belongs to a tenant",
+      "Trust a tenant ID supplied only in model-generated arguments",
+      "Expose credentials to the model so it can select an identity",
+      "Assume login implies permission to use every backend resource"
+    ],
+    "answer": [
+      0,
+      1
+    ],
+    "why": "Authentication establishes identity. Each operation still needs authorization against the requested resource. Server-side checks must bind the action to trusted caller context, not to untrusted tool arguments.",
+    "type": "multi",
+    "refs": [
+      "integration"
+    ],
+    "objective": "Authentication and authorization",
+    "chapter": "domain-3",
+    "origin": "Original practice scenario; adapted and reviewed from the owner’s study notes."
+  },
+  {
+    "id": 22,
+    "domain": 3,
+    "q": "Three MCP-capable assistant clients need the same governed document-lookup tool. The team wants a standard discovery and invocation interface. Which integration is the best fit?",
+    "choices": [
+      "An MCP server — one governed boundary, reusable across multiple clients, with a single place to audit what the capability can reach",
+      "A direct Messages API integration in each consumer, for maximum per-consumer control",
+      "An agent-to-agent protocol, so each consumer runs its own agent that negotiates with a policy agent",
+      "A headless CLI invocation wrapped in a shell script that each consumer calls"
+    ],
+    "answer": [
+      0
+    ],
+    "why": "An MCP server is a fit for a reusable tool interface across MCP clients. The service still needs its own authentication, authorization, and auditing. A direct API can be appropriate for a single custom consumer; this scenario emphasizes compatible clients and standardized tool discovery.",
+    "type": "single",
+    "refs": [
+      "integration"
+    ],
+    "objective": "Integration mechanisms",
+    "chapter": "domain-3",
+    "origin": "Original practice scenario; adapted and reviewed from the owner’s study notes."
+  },
+  {
+    "id": 23,
+    "domain": 3,
+    "q": "Users query a knowledge base both with exact error codes and with conceptual symptom descriptions. Dense-only retrieval misses many exact codes. Which candidate strategy should be evaluated?",
+    "choices": [
+      "Hybrid search combining keyword/BM25 with dense vectors, then rerank",
+      "Dense vector search only, with a high top-k",
+      "Dense vector search over chunks that merge the manual and the code samples",
+      "Keyword search only, since all queries contain an error code"
+    ],
+    "answer": [
+      0
+    ],
+    "why": "Hybrid retrieval combines lexical matching with semantic similarity; reranking can improve the selected evidence. Compare against measured baselines. No search strategy is automatically best for every corpus.",
+    "type": "single",
+    "refs": [
+      "rag"
+    ],
+    "objective": "Retrieval strategy",
+    "chapter": "domain-3",
+    "origin": "Original practice scenario; adapted and reviewed from the owner’s study notes."
+  },
+  {
+    "id": 24,
+    "domain": 3,
+    "q": "A RAG team adopted a new embedding model and used it only for newly added documents; older documents kept their original vectors. Retrieval quality then dropped across the board. What is the most likely cause?",
+    "choices": [
+      "Queries are embedded with the new model but most stored vectors came from the old one, so similarity scores are not comparable",
+      "The new embedding model produces lower-quality embeddings than the old one",
+      "The index grew too large after adding new documents",
+      "The chunking strategy changed at the same time as the embedding model"
+    ],
+    "answer": [
+      0
+    ],
+    "why": "Keep query and document vectors in a compatible embedding space. Migrate by building a consistently re-embedded index and validating before switching traffic, or isolate old and new indexes with matching query encoders. Mixing incompatible vectors in one similarity search is the defect.",
+    "type": "single",
+    "refs": [
+      "integration"
+    ],
+    "objective": "Embedding and index integrity",
+    "chapter": "domain-3",
+    "origin": "Original practice scenario; adapted and reviewed from the owner’s study notes."
+  },
+  {
+    "id": 25,
+    "domain": 3,
+    "q": "A multi-tenant RAG application must never return one tenant's documents to another. Where should the tenant constraint be applied?",
+    "choices": [
+      "As a metadata filter applied before or during the vector search, enforced server-side",
+      "In the system prompt, instructing Claude to ignore documents from other tenants",
+      "As a post-processing step that removes foreign documents from the model's answer",
+      "By running a separate model instance per tenant"
+    ],
+    "answer": [
+      0
+    ],
+    "why": "Tenant isolation is an access-control property and must be enforced where it cannot be bypassed — in the query itself, before content ever reaches the context. A prompt instruction is a soft control over data already exposed, and post-processing the answer means the model already saw the other tenant's data. Per-tenant model instances address nothing, since the index is the shared surface.",
+    "type": "single",
+    "refs": [
+      "safety"
+    ],
+    "objective": "Retrieval access control",
+    "chapter": "domain-3",
+    "origin": "Original practice scenario; adapted and reviewed from the owner’s study notes."
+  },
+  {
+    "id": 26,
+    "domain": 3,
+    "q": "Map each operation to its RAG pipeline stage. Use each stage once.",
+    "why": "The pipeline preserves provenance and permissions from ingestion to the final answer. Embedding produces representations; indexing stores searchable data. Retrieval selects evidence; generation uses it.",
+    "type": "match",
+    "labels": [
+      "Ingestion",
+      "Chunking",
+      "Embedding",
+      "Indexing",
+      "Retrieval and reranking",
+      "Grounded generation"
+    ],
+    "rows": [
+      {
+        "text": "Parse approved source files and capture document versions and access metadata",
+        "answer": 0
+      },
+      {
+        "text": "Split a manual into meaningful units while retaining heading context",
+        "answer": 1
+      },
+      {
+        "text": "Encode text into vectors using a selected embedding model",
+        "answer": 2
+      },
+      {
+        "text": "Store searchable chunks, vectors, and metadata in the search system",
+        "answer": 3
+      },
+      {
+        "text": "Find authorized candidate chunks and order them for relevance to the query",
+        "answer": 4
+      },
+      {
+        "text": "Produce an answer supported by the selected evidence and source references",
+        "answer": 5
+      }
+    ],
+    "refs": [
+      "design"
+    ],
+    "objective": "RAG pipeline stages",
+    "chapter": "domain-3",
+    "origin": "Original practice scenario; adapted and reviewed from the owner’s study notes."
+  },
+  {
+    "id": 27,
+    "domain": 3,
+    "q": "An offline analysis job can tolerate up to a 24-hour processing window and does not block user work. Which API approach is worth evaluating to lower inference cost?",
+    "choices": [
+      "Use Message Batches and handle completion, errors, and expiration asynchronously",
+      "Run synchronous requests and block a worker until every result arrives",
+      "Discard hard cases so only short requests remain",
+      "Cache unique documents once and assume every request will be a cache hit"
+    ],
+    "answer": [
+      0
+    ],
+    "why": "Batch processing offers discounted asynchronous inference for supported workloads. The documented window can extend to 24 hours, so it should not be assumed to meet an overnight deadline shorter than that. Handle per-request outcomes explicitly.",
+    "type": "single",
+    "refs": [
+      "batch"
+    ],
+    "objective": "Latency and cost trade-offs",
+    "chapter": "domain-3",
+    "origin": "Original practice scenario; adapted and reviewed from the owner’s study notes."
+  },
+  {
+    "id": 28,
+    "domain": 3,
+    "q": "A CI job starts Claude Code in its interactive interface and waits for terminal input. Which invocation fits this non-interactive use?",
+    "choices": [
+      "claude -p \"Review this change\" --output-format json",
+      "claude, followed by a manual prompt in the terminal",
+      "A browser session that waits for a person to click Send",
+      "An interactive REPL with no stdin or timeout handling"
+    ],
+    "answer": [
+      0
+    ],
+    "why": "Print mode (-p) runs programmatically, and JSON output can be parsed by the job. Configure credentials, permissions, and failure handling deliberately; programmatic execution does not justify bypassing permissions.",
+    "type": "single",
+    "refs": [
+      "headless"
+    ],
+    "objective": "API and CLI integration",
+    "chapter": "domain-3",
+    "origin": "Original practice scenario; adapted and reviewed from the owner’s study notes."
+  },
+  {
+    "id": 29,
+    "domain": 3,
+    "q": "At what point in an agent's request path must a tool's authorization check run for it to be a real control?",
+    "choices": [
+      "Inside the tool implementation, before the action is taken, against the caller's identity",
+      "In the system prompt, as an instruction the model follows before calling the tool",
+      "In the tool description, so the model knows who may use it",
+      "In output screening, so unauthorized results are removed before they reach the user"
+    ],
+    "answer": [
+      0
+    ],
+    "why": "Tool permissions are the one hard layer in the safety stack — they determine what is physically possible. Prompts and tool descriptions are instructions the model can be talked around, and output screening runs after the action has already happened, which is far too late for a refund or a deletion.",
+    "type": "single",
+    "refs": [
+      "safety"
+    ],
+    "objective": "Tool-call authorization",
+    "chapter": "domain-3",
+    "origin": "Original practice scenario; adapted and reviewed from the owner’s study notes."
+  },
+  {
+    "id": 30,
+    "domain": 3,
+    "q": "A production team needs to diagnose incorrect answers without collecting unnecessary personal data. Which TWO trace groups are most useful?",
+    "choices": [
+      "Correlation IDs with prompt/model configuration, latency, token usage, and error status",
+      "Retrieved source IDs and authorized tool-call outcomes, with sensitive fields redacted",
+      "Full customer profiles on every span regardless of relevance",
+      "Raw access tokens so engineers can replay as the user",
+      "Only aggregate daily request counts with no correlation IDs",
+      "Unbounded copies of every private document in the logging system"
+    ],
+    "answer": [
+      0,
+      1
+    ],
+    "why": "Correlated configuration and execution evidence support diagnosis. Minimize logged content, redact sensitive values, and set access and retention controls; more raw data is not automatically better observability.",
+    "type": "multi",
+    "refs": [
+      "integration"
+    ],
+    "objective": "Observability at scale",
+    "chapter": "domain-3",
+    "origin": "Original practice scenario; adapted and reviewed from the owner’s study notes."
+  },
+  {
+    "id": 31,
+    "domain": 3,
+    "q": "A developer proposes putting a backend credential into the system prompt so Claude can authenticate tool calls. What should the architect require?",
+    "choices": [
+      "Keep secrets in the trusted execution layer and have tools use scoped credentials outside model context",
+      "Put the credential in a few-shot example instead",
+      "Log the credential on each call for traceability",
+      "Ask Claude to remember the credential but never print it"
+    ],
+    "answer": [
+      0
+    ],
+    "why": "The model needs a tool interface, not the secret used by its executor. Credentials belong in controlled runtime configuration. Scope and rotate them according to the integration’s supported authentication mechanism.",
+    "type": "single",
+    "refs": [
+      "integration"
+    ],
+    "objective": "Secrets and authentication",
+    "chapter": "domain-3",
+    "origin": "Original practice scenario; adapted and reviewed from the owner’s study notes."
+  },
+  {
+    "id": 32,
+    "domain": 4,
+    "q": "After rebuilding a product index, answer accuracy drops while the prompt and model remain unchanged. A failing trace shows chunks from retired product versions. What should be repaired first?",
+    "choices": [
+      "The indexing and retrieval version filters that selected retired evidence",
+      "The model temperature, without changing the retrieved evidence",
+      "The UI text size used to display the answer",
+      "The request timeout, although the response completed on time"
+    ],
+    "answer": [
+      0
+    ],
+    "why": "The trace gives direct evidence of wrong source selection. Repair and test freshness and version filtering before changing an unrelated component. Add the failing query to a retrieval regression set.",
+    "type": "single",
+    "refs": [
+      "integration"
+    ],
+    "objective": "Root-cause diagnosis",
+    "chapter": "domain-4",
+    "origin": "Original practice scenario; adapted and reviewed from the owner’s study notes."
+  },
+  {
+    "id": 33,
+    "domain": 4,
+    "q": "Choose the most appropriate primary evaluation method for each requirement. Methods may be reused.",
+    "why": "Match the measurement to the behavior. Deterministic properties suit code; interpretation needs calibrated judgment. Performance, causal comparison, and hostile-input behavior require different experiments.",
+    "type": "match",
+    "labels": [
+      "Code-based grader",
+      "Calibrated model grader",
+      "Human expert review",
+      "Load test",
+      "Controlled A/B test",
+      "Adversarial security test"
+    ],
+    "rows": [
+      {
+        "text": "Verify that every response satisfies a JSON schema",
+        "answer": 0
+      },
+      {
+        "text": "Apply a stable rubric to response tone at scale, with human calibration",
+        "answer": 1
+      },
+      {
+        "text": "Adjudicate a novel high-stakes case with no validated automated rubric",
+        "answer": 2
+      },
+      {
+        "text": "Measure p95 latency at the expected concurrent request volume",
+        "answer": 3
+      },
+      {
+        "text": "Compare two validated variants on randomly assigned eligible live traffic",
+        "answer": 4
+      },
+      {
+        "text": "Probe whether malicious retrieved instructions can trigger an unauthorized action",
+        "answer": 5
+      }
+    ],
+    "refs": [
+      "evals"
+    ],
+    "objective": "Evaluation methodology",
+    "chapter": "domain-4",
+    "origin": "Original practice scenario; adapted and reviewed from the owner’s study notes."
+  },
+  {
+    "id": 34,
+    "domain": 4,
+    "q": "A model-based judge gives inconsistent quality labels. Which TWO changes directly strengthen its evaluation design?",
+    "choices": [
+      "Define explicit rubric criteria and a constrained set of verdict labels",
+      "Measure agreement against human-labeled examples and inspect disagreements",
+      "Treat a judge’s explanation as proof the score is correct",
+      "Change the rubric after each candidate result to favor the latest model",
+      "Remove human review because the judge is more scalable",
+      "Use maximum effort as the only validation of judge quality"
+    ],
+    "answer": [
+      0,
+      1
+    ],
+    "why": "A rubric makes the target explicit; human calibration tests whether the judge applies it usefully. Neither fluent explanations nor additional computation establish validity.",
+    "type": "multi",
+    "refs": [
+      "evals"
+    ],
+    "objective": "Evaluation rubrics",
+    "chapter": "domain-4",
+    "origin": "Original practice scenario; adapted and reviewed from the owner’s study notes."
+  },
+  {
+    "id": 35,
+    "domain": 4,
+    "q": "Why should evaluation criteria be defined before implementation begins?",
+    "choices": [
+      "They force success to be stated measurably, expose design assumptions while changing them is still cheap, and provide the gate for every later change",
+      "Regulators require evaluation documentation before development starts",
+      "Writing evaluations later is technically more difficult",
+      "Evaluation datasets cannot be constructed once production traffic exists"
+    ],
+    "answer": [
+      0
+    ],
+    "why": "Those three reasons are the whole argument for evals-before-code. Writing the eval first reveals that there is no ground truth, or that two stakeholders disagree about what correct means — and week one is when that is cheap to resolve. The other options are not true in general.",
+    "type": "single",
+    "refs": [
+      "integration"
+    ],
+    "objective": "Acceptance metrics",
+    "chapter": "domain-4",
+    "origin": "Original practice scenario; adapted and reviewed from the owner’s study notes."
+  },
+  {
+    "id": 36,
+    "domain": 4,
+    "q": "A newer Claude model has been released and the team wants to switch to it. What is the best approach?",
+    "choices": [
+      "Run the eval suite on the new model, check cost and latency, roll it out gradually, and keep the ability to roll back",
+      "Switch in production and monitor error rates for a week",
+      "Switch only for new customers, leaving existing customers on the current model permanently",
+      "Benchmark the new model on published evaluations and adopt it if it scores higher"
+    ],
+    "answer": [
+      0
+    ],
+    "why": "All four clauses matter. Your eval suite measures your task, which public benchmarks do not; cost and latency can regress even when accuracy improves; gradual rollout limits blast radius; and rollback is what makes the change reversible. An option missing any clause is incomplete.",
+    "type": "single",
+    "refs": [
+      "lifecycle"
+    ],
+    "objective": "Controlled model upgrades",
+    "chapter": "domain-4",
+    "origin": "Original practice scenario; adapted and reviewed from the owner’s study notes."
+  },
+  {
+    "id": 37,
+    "domain": 4,
+    "q": "A prompt improves aggregate accuracy from 88% to 91%. Overall measurement uncertainty has been checked. Which additional analysis is most important before rollout?",
+    "choices": [
+      "Whether any segment regressed, since an aggregate gain can hide a loss in a subgroup that matters",
+      "Whether the eval set is large enough to reach 95% confidence on the aggregate",
+      "Whether the same prompt improves scores on a public benchmark",
+      "Whether the improvement persists after switching to a smaller model"
+    ],
+    "answer": [
+      0
+    ],
+    "why": "Inspect performance on important segments and failure classes. Aggregate gains can hide regressions on rare or consequential cases. Also retain the agreed latency, cost, and safety gates.",
+    "type": "single",
+    "refs": [
+      "integration"
+    ],
+    "objective": "Segmented evaluation",
+    "chapter": "domain-4",
+    "origin": "Original practice scenario; adapted and reviewed from the owner’s study notes."
+  },
+  {
+    "id": 38,
+    "domain": 4,
+    "q": "Two prompts pass offline quality checks. The team wants to compare them in a live A/B test. Which TWO design choices make the comparison more interpretable?",
+    "choices": [
+      "Randomly assign eligible users or sessions using a consistent assignment unit",
+      "Predefine the primary metric, guardrails, analysis window, and stopping rules",
+      "Send the new prompt only to the easiest cases",
+      "Change the retrieval model only for the new-prompt group",
+      "Stop as soon as the new variant has a favorable hour",
+      "Measure only total request count and ignore task outcomes"
+    ],
+    "answer": [
+      0,
+      1
+    ],
+    "why": "Randomization helps balance confounders. A predefined measurement and stopping plan reduces opportunistic interpretation. Keep other components stable when estimating the prompt’s effect, and protect safety guardrails.",
+    "type": "multi",
+    "refs": [
+      "integration"
+    ],
+    "objective": "A/B testing",
+    "chapter": "domain-4",
+    "origin": "Original practice scenario; adapted and reviewed from the owner’s study notes."
+  },
+  {
+    "id": 39,
+    "domain": 4,
+    "q": "Spend per request rises after a logging change inserts a unique trace ID at the start of the cached prompt. Model, traffic mix, and prices are unchanged. What should be checked first?",
+    "choices": [
+      "Cache read token counts, to find whether a silent invalidator broke prefix reuse",
+      "Whether the model provider raised prices",
+      "Whether output token limits were increased",
+      "Whether more users were added to the account"
+    ],
+    "answer": [
+      0
+    ],
+    "why": "The trace ID makes the reusable prefix vary. Check cache-read and cache-creation usage, then move request-specific data outside the reusable region. The explicit change makes cache behavior the first hypothesis here.",
+    "type": "single",
+    "refs": [
+      "cache"
+    ],
+    "objective": "Cost diagnosis",
+    "chapter": "domain-4",
+    "origin": "Original practice scenario; adapted and reviewed from the owner’s study notes."
+  },
+  {
+    "id": 40,
+    "domain": 4,
+    "q": "A production incident is resolved by fixing a prompt. What should happen to the incident afterward?",
+    "choices": [
+      "The failing case becomes a permanent case in the eval suite so the regression cannot silently return",
+      "The incident is documented in the postmortem and closed",
+      "The prompt is frozen so it cannot be changed again",
+      "The case is added to the training data for a fine-tune"
+    ],
+    "answer": [
+      0
+    ],
+    "why": "This is the mechanism by which a system becomes more reliable rather than merely older: every incident converts into a permanent gate. A postmortem records what happened but does not prevent recurrence; freezing the prompt prevents improvement rather than regression.",
+    "type": "single",
+    "refs": [
+      "integration"
+    ],
+    "objective": "Regression testing",
+    "chapter": "domain-4",
+    "origin": "Original practice scenario; adapted and reviewed from the owner’s study notes."
+  },
+  {
+    "id": 41,
+    "domain": 4,
+    "q": "Which metric best reflects the true economics of an agentic system?",
+    "choices": [
+      "Cost per completed task",
+      "Cost per API request",
+      "Input tokens per request",
+      "Average response latency"
+    ],
+    "answer": [
+      0
+    ],
+    "why": "An agent may take many requests to finish one unit of work. A configuration with cheaper requests that needs three more turns or a retry is not cheaper. Per-request cost and per-request token counts are inputs to the calculation, not the answer; latency is a separate axis entirely.",
+    "type": "single",
+    "refs": [
+      "integration"
+    ],
+    "objective": "Unit economics",
+    "chapter": "domain-4",
+    "origin": "Original practice scenario; adapted and reviewed from the owner’s study notes."
+  },
+  {
+    "id": 42,
+    "domain": 5,
+    "q": "A service assistant has good overall accuracy, but users from one supported language group report many more incorrect responses. What should the team do first?",
+    "choices": [
+      "Evaluate representative cases by relevant group, inspect error types and data coverage, and define a remediation and monitoring plan",
+      "Publish the aggregate score as sufficient evidence of fairness",
+      "Remove group-level measurements so results appear consistent",
+      "Assume identical prompts guarantee equal outcomes"
+    ],
+    "answer": [
+      0
+    ],
+    "why": "An aggregate can conceal uneven performance. Investigate the relevant group and error patterns with appropriately governed data, then validate remediation and continue monitoring. A single aggregate metric does not establish fairness.",
+    "type": "single",
+    "refs": [
+      "safety"
+    ],
+    "objective": "Bias, fairness, and transparency",
+    "chapter": "domain-5",
+    "origin": "Original practice scenario; adapted and reviewed from the owner’s study notes."
+  },
+  {
+    "id": 43,
+    "domain": 5,
+    "q": "A retrieved email tells a support agent to ignore policy and transfer money. The workflow is authorized only to draft responses. Which TWO controls directly address this attack?",
+    "choices": [
+      "Treat the email as untrusted task data, not as authority to change instructions",
+      "Keep payment tools unavailable to the drafting role and enforce permissions in the executor",
+      "Give the model a payment credential so it can inspect the request",
+      "Execute the transfer, then ask a reviewer whether it was appropriate",
+      "Trust the email because it arrived through an authenticated mailbox",
+      "Rely solely on an instruction that the model should be careful"
+    ],
+    "answer": [
+      0,
+      1
+    ],
+    "why": "Untrusted content cannot grant authority. Separate instruction from data and constrain the role’s executable capabilities. Authenticating a mailbox does not make every message instruction trustworthy.",
+    "type": "multi",
+    "refs": [
+      "safety"
+    ],
+    "objective": "Prompt injection defenses",
+    "chapter": "domain-5",
+    "origin": "Original practice scenario; adapted and reviewed from the owner’s study notes."
+  },
+  {
+    "id": 44,
+    "domain": 5,
+    "q": "A system classifies approved metadata reads as low risk and account deletions as high impact. How should human approval be applied?",
+    "choices": [
+      "Require approval only for the high-impact or irreversible actions, let reads run automatically, and audit a sample of them",
+      "Require approval for every action so nothing is unreviewed",
+      "Require approval for nothing, and review the daily log the following morning",
+      "Require approval only when the model reports low confidence"
+    ],
+    "answer": [
+      0
+    ],
+    "why": "Under the stated risk classification, automate the permitted reads with auditing, and gate high-impact actions before execution. Review policy should consider impact and reversibility as well as calibrated uncertainty, not model confidence alone.",
+    "type": "single",
+    "refs": [
+      "safety"
+    ],
+    "objective": "Human-in-the-loop review",
+    "chapter": "domain-5",
+    "origin": "Original practice scenario; adapted and reviewed from the owner’s study notes."
+  },
+  {
+    "id": 45,
+    "domain": 5,
+    "q": "A US HIPAA-covered provider plans to send ePHI to a cloud service. Which pre-deployment check directly addresses the cloud-processing obligation?",
+    "choices": [
+      "Verify an appropriate BAA covers the service relationship and assess safeguards and data flows with the responsible compliance team",
+      "Assume physician review replaces the cloud provider agreement",
+      "Assume encryption alone removes business-associate obligations",
+      "Assume a model trained on medical text is automatically covered"
+    ],
+    "answer": [
+      0
+    ],
+    "why": "HHS guidance addresses BAAs and risk analysis for cloud services processing ePHI. Coverage and safeguards must be checked for the actual arrangement. Clinical review does not replace those obligations.",
+    "type": "single",
+    "refs": [
+      "hipaa"
+    ],
+    "objective": "HIPAA data handling",
+    "chapter": "domain-5",
+    "origin": "Original practice scenario; adapted and reviewed from the owner’s study notes."
+  },
+  {
+    "id": 46,
+    "domain": 5,
+    "q": "An organization receives a valid erasure request under the UK GDPR. Personal data also appears in search indexes and backups. What is the best architectural response?",
+    "choices": [
+      "Map relevant copies and processors, apply the approved erasure process and exceptions, and document how backup data is put beyond use pending deletion",
+      "Delete only the primary record and assume derived copies are unrelated",
+      "Retain all data indefinitely because it might improve evaluations",
+      "Promise instantaneous deletion from every backup without checking the retention process"
+    ],
+    "answer": [
+      0
+    ],
+    "why": "Erasure is not absolute; applicable exceptions and backup arrangements matter. The architecture needs data lineage and a documented process across relevant stores, with clear communication about retained backup data. This item concerns UK GDPR guidance.",
+    "type": "single",
+    "refs": [
+      "erasure"
+    ],
+    "objective": "Erasure and data lifecycle",
+    "chapter": "domain-5",
+    "origin": "Original practice scenario; adapted and reviewed from the owner’s study notes."
+  },
+  {
+    "id": 47,
+    "domain": 5,
+    "q": "A federal project is considering a cloud AI service. A salesperson says the vendor is “FedRAMP compliant.” What should the architect verify?",
+    "choices": [
+      "The specific cloud offering and its certification evidence, the intended configuration, customer responsibilities, and the agency’s own authorization requirements",
+      "Only whether the vendor’s parent company has any government customers",
+      "Only whether the application is deployed in a region named Government",
+      "Whether the prompt tells the model to follow federal policies"
+    ],
+    "answer": [
+      0
+    ],
+    "why": "FedRAMP evidence concerns the cloud service offering. The agency still accepts risk for its specific system and use, including configuration, integrations, and its own controls. Vendor branding is insufficient.",
+    "type": "single",
+    "refs": [
+      "fedramp"
+    ],
+    "objective": "FedRAMP deployment review",
+    "chapter": "domain-5",
+    "origin": "Original practice scenario; adapted and reviewed from the owner’s study notes."
+  },
+  {
+    "id": 48,
+    "domain": 5,
+    "q": "Match each control to the place where it performs its main function. Use each option once.",
+    "why": "These controls have different timing and authority. Authorization prevents an impermissible operation; output screening after execution cannot undo it. Instructions, human review, and monitoring complement the enforcement boundary.",
+    "type": "match",
+    "labels": [
+      "Input screening",
+      "System instructions",
+      "Tool authorization",
+      "Output validation",
+      "Human approval",
+      "Production monitoring"
+    ],
+    "rows": [
+      {
+        "text": "Check incoming content for disallowed requests before generation",
+        "answer": 0
+      },
+      {
+        "text": "Define task scope and evidence-handling behavior for the model",
+        "answer": 1
+      },
+      {
+        "text": "Verify the caller may modify the requested account before execution",
+        "answer": 2
+      },
+      {
+        "text": "Validate response structure and source references before delivery",
+        "answer": 3
+      },
+      {
+        "text": "Ask an accountable reviewer to approve a high-impact action before it runs",
+        "answer": 4
+      },
+      {
+        "text": "Detect a rising rate of unsafe outputs or failures across deployed traffic",
+        "answer": 5
+      }
+    ],
+    "refs": [
+      "safety"
+    ],
+    "objective": "Safety control placement",
+    "chapter": "domain-5",
+    "origin": "Original practice scenario; adapted and reviewed from the owner’s study notes."
+  },
+  {
+    "id": 49,
+    "domain": 5,
+    "q": "Policy requires a safety check before an agent may perform a sensitive write. The checker is unavailable. What should happen?",
+    "choices": [
+      "Deny or degrade to a restricted mode — fail closed",
+      "Proceed without the check and log that it was skipped",
+      "Retry the classifier indefinitely until it responds",
+      "Fall back to having the model classify its own input"
+    ],
+    "answer": [
+      0
+    ],
+    "why": "Do not perform a write whose required check could not complete. Reject it or use an explicitly approved restricted mode. Bounded retries may be appropriate; silently bypassing the control is not.",
+    "type": "single",
+    "refs": [
+      "safety"
+    ],
+    "objective": "Fail-closed behavior",
+    "chapter": "domain-5",
+    "origin": "Original practice scenario; adapted and reviewed from the owner’s study notes."
+  },
+  {
+    "id": 50,
+    "domain": 5,
+    "q": "A research assistant must avoid unsupported citations. Which TWO controls most directly test whether its references support its claims?",
+    "choices": [
+      "Resolve each cited identifier to an authorized source that actually exists",
+      "Check that the cited passage supports the associated claim, with review for ambiguous cases",
+      "Accept a plausible citation title even when it cannot be resolved",
+      "Score confidence from the length of the answer",
+      "Require at least five citations even when only one source is relevant",
+      "Treat a valid URL as proof of every claim attached to it"
+    ],
+    "answer": [
+      0,
+      1
+    ],
+    "why": "Existence is necessary but not sufficient: a real document can be cited for a claim it does not support. Validate both the target and the relationship between the evidence and claim; allow an insufficient-evidence response.",
+    "type": "multi",
+    "refs": [
+      "safety"
+    ],
+    "objective": "Grounding and hallucination controls",
+    "chapter": "domain-5",
+    "origin": "Original practice scenario; adapted and reviewed from the owner’s study notes."
+  },
+  {
+    "id": 51,
+    "domain": 6,
+    "q": "A pilot uses confidential data and will be operated by another team. Which TWO discovery actions reduce predictable late-stage blockers?",
+    "choices": [
+      "Involve data owners, security, and relevant legal or compliance reviewers in the proposed data path",
+      "Agree with the receiving operations team on ownership, support expectations, and acceptance evidence",
+      "Defer data-access questions until the demo has executive support",
+      "Select the model before defining the task or constraints",
+      "Assume the sponsor can waive every technical and legal control",
+      "Plan for the architect to remain the sole operator indefinitely"
+    ],
+    "answer": [
+      0,
+      1
+    ],
+    "why": "Discovery must include people who control data, approve risks, and operate the result. Their requirements affect the architecture while changes are still inexpensive.",
+    "type": "multi",
+    "refs": [
+      "lifecycle"
+    ],
+    "objective": "Structured discovery",
+    "chapter": "domain-6",
+    "origin": "Original practice scenario; adapted and reviewed from the owner’s study notes."
+  },
+  {
+    "id": 52,
+    "domain": 6,
+    "q": "A client offers four candidate use cases. Which is the best choice for a first pilot?",
+    "choices": [
+      "A contained use case with clear current-state metrics, available data, an engaged sponsor, and manageable risk",
+      "The highest-value use case, so the return justifies the investment",
+      "The most technically interesting use case, so the team builds the deepest capability",
+      "The most visible use case, so executives see the results"
+    ],
+    "answer": [
+      0
+    ],
+    "why": "A bounded, measurable, supportable use case can produce useful pilot evidence. Business value matters, but visibility or technical novelty alone does not establish that the pilot can be delivered and assessed.",
+    "type": "single",
+    "refs": [
+      "lifecycle"
+    ],
+    "objective": "Pilot selection",
+    "chapter": "domain-6",
+    "origin": "Original practice scenario; adapted and reviewed from the owner’s study notes."
+  },
+  {
+    "id": 53,
+    "domain": 6,
+    "q": "Six months after a system ships, a new engineer asks why the team chose a workflow instead of an agent. What artifact should answer this?",
+    "choices": [
+      "An architecture decision record capturing the context, the options considered, the decision, the reasons for it, and its consequences",
+      "The original requirements document",
+      "The eval suite and its historical results",
+      "The runbook for the system"
+    ],
+    "answer": [
+      0
+    ],
+    "why": "An ADR exists precisely for this moment. Options considered and consequences are the two parts people omit, and they are the two parts that stop a team either re-litigating the decision or repeating the mistake it was avoiding. Requirements say what was needed, evals say whether it works, and runbooks say how to operate it — none explains why.",
+    "type": "single",
+    "refs": [
+      "lifecycle"
+    ],
+    "objective": "Architecture documentation",
+    "chapter": "domain-6",
+    "origin": "Original practice scenario; adapted and reviewed from the owner’s study notes."
+  },
+  {
+    "id": 54,
+    "domain": 6,
+    "q": "Adoption of a launched system is at 12% three months in. What should the architect do first?",
+    "choices": [
+      "Find out why — how well it fits people's daily work and tools, whether they were trained, whether they trust it, and what they say about it — then fix those issues",
+      "Add the most-requested features from the original backlog",
+      "Upgrade to a more capable model to improve output quality",
+      "Mandate use of the system through the sponsor"
+    ],
+    "answer": [
+      0
+    ],
+    "why": "Diagnose before you fix. Low adoption has four common causes with four different remedies: fit is an integration problem, training is an enablement problem, trust is an accuracy-and-transparency problem, and sentiment usually reflects one of the others. Adding features or capability to a system nobody uses spends budget on a cause you have not established.",
+    "type": "single",
+    "refs": [
+      "lifecycle"
+    ],
+    "objective": "Stakeholder feedback",
+    "chapter": "domain-6",
+    "origin": "Original practice scenario; adapted and reviewed from the owner’s study notes."
+  },
+  {
+    "id": 55,
+    "domain": 6,
+    "q": "The receiving team has documentation but has never operated the new system. Which TWO handoff activities best establish readiness?",
+    "choices": [
+      "Have that team run incident and rollback exercises while the architect is available",
+      "Assign owners for runbooks, alerts, evaluation gates, and escalation paths",
+      "Treat a recorded architecture presentation as sufficient proof of readiness",
+      "Keep production access and all recovery knowledge with the architect",
+      "Disable alerts during handoff so the team is not distracted",
+      "Freeze the system forever to eliminate the need for future knowledge transfer"
+    ],
+    "answer": [
+      0,
+      1
+    ],
+    "why": "Practice reveals missing instructions and access before the architect leaves. Named ownership keeps operational artifacts maintained. Documentation alone does not demonstrate that the team can recover the service.",
+    "type": "multi",
+    "refs": [
+      "lifecycle"
+    ],
+    "objective": "Operational handoff",
+    "chapter": "domain-6",
+    "origin": "Original practice scenario; adapted and reviewed from the owner’s study notes."
+  },
+  {
+    "id": 56,
+    "domain": 6,
+    "q": "Users complain about slow requests despite a good average response time. What should a latency service commitment specify?",
+    "choices": [
+      "An end-to-end tail-latency target, measurement window and scope, plus agreed timeout and degraded behavior",
+      "Only an average over all requests since launch",
+      "Only the fastest observed provider response",
+      "A claim of zero latency for every request"
+    ],
+    "answer": [
+      0
+    ],
+    "why": "Specify how the measure is calculated and which requests it covers. Tail measures such as p95 expose slow experiences hidden by averages. Include the behavior when a dependency misses the budget; distinguish internal SLOs from contractual SLAs.",
+    "type": "single",
+    "refs": [
+      "lifecycle"
+    ],
+    "objective": "SLAs and degraded modes",
+    "chapter": "domain-6",
+    "origin": "Original practice scenario; adapted and reviewed from the owner’s study notes."
+  },
+  {
+    "id": 57,
+    "domain": 6,
+    "q": "A stakeholder expects the system to give the same answer to the same question every time. What must the architect communicate?",
+    "choices": [
+      "That the system is non-deterministic, so quality is committed as a measured rate on a defined eval set with stated behavior on the remainder",
+      "That determinism can be achieved by setting temperature to zero",
+      "That the question is unlikely to be asked identically twice in practice",
+      "That determinism will improve as the model matures"
+    ],
+    "answer": [
+      0
+    ],
+    "why": "Explain variability and define measured quality, acceptable output differences, and handling of failures. A temperature setting alone does not guarantee identical outputs or correct answers.",
+    "type": "single",
+    "refs": [
+      "lifecycle"
+    ],
+    "objective": "Expectation alignment",
+    "chapter": "domain-6",
+    "origin": "Original practice scenario; adapted and reviewed from the owner’s study notes."
+  },
+  {
+    "id": 58,
+    "domain": 6,
+    "q": "An architect presents three feasible designs with costs and trade-offs but no preferred option. Stakeholders ask for a decision they can act on. What should be added?",
+    "choices": [
+      "A recommendation — the architect has the most information and owes a defended position, not just an enumeration",
+      "A cost estimate for each option",
+      "A fourth option for completeness",
+      "A vote from the engineering team"
+    ],
+    "answer": [
+      0
+    ],
+    "why": "Offer a recommendation tied to the stated constraints, with assumptions and consequences. Stakeholders retain decision authority; the architect supplies a reasoned position rather than an unexplained menu.",
+    "type": "single",
+    "refs": [
+      "lifecycle"
+    ],
+    "objective": "Trade-off communication",
+    "chapter": "domain-6",
+    "origin": "Original practice scenario; adapted and reviewed from the owner’s study notes."
+  },
+  {
+    "id": 59,
+    "domain": 6,
+    "q": "Match each activity to its primary lifecycle phase in this study model. Phases may recur during iteration; use each option once.",
+    "why": "This is a study taxonomy, not a claim that delivery is strictly linear. Discovery defines the problem; design proposes the system; evaluation tests it; rollout controls exposure; handoff transfers operation; monitoring feeds the next cycle.",
+    "type": "match",
+    "labels": [
+      "Discovery",
+      "Design",
+      "Evaluation",
+      "Pilot and rollout",
+      "Handoff",
+      "Monitoring and iteration"
+    ],
+    "rows": [
+      {
+        "text": "Establish the current workflow, baseline, constraints, and required approvers",
+        "answer": 0
+      },
+      {
+        "text": "Specify the data flow, integration boundaries, and architectural trade-offs",
+        "answer": 1
+      },
+      {
+        "text": "Run agreed task, safety, latency, and cost acceptance checks",
+        "answer": 2
+      },
+      {
+        "text": "Release to a limited cohort, inspect guardrails, and expand with rollback available",
+        "answer": 3
+      },
+      {
+        "text": "Transfer ownership and have the receiving team rehearse operations",
+        "answer": 4
+      },
+      {
+        "text": "Use incidents, drift, and feedback to select and validate the next improvement",
+        "answer": 5
+      }
+    ],
+    "refs": [
+      "lifecycle"
+    ],
+    "objective": "Lifecycle phases",
+    "chapter": "domain-6",
+    "origin": "Original practice scenario; adapted and reviewed from the owner’s study notes."
+  },
+  {
+    "id": 60,
+    "domain": 7,
+    "q": "Several repositories need a reusable Claude Code capability with shared updates. Which TWO practices support maintainable distribution?",
+    "choices": [
+      "Package the reusable capabilities as a plugin with a documented installation route",
+      "Version the package and test updates before rolling them out to consuming teams",
+      "Paste untracked copies into every developer’s personal settings",
+      "Share a single administrator API key in the plugin",
+      "Treat a plugin as proof that all included commands are safe",
+      "Remove release history so every team must run the latest untested version"
+    ],
+    "answer": [
+      0,
+      1
+    ],
+    "why": "Plugins package reusable Claude Code extensions. Versioning and update testing help teams manage changes; distribution does not replace permissions or code review.",
+    "type": "multi",
+    "refs": [
+      "plugins"
+    ],
+    "objective": "Team configuration and reuse",
+    "chapter": "domain-7",
+    "origin": "Original practice scenario; adapted and reviewed from the owner’s study notes."
+  },
+  {
+    "id": 61,
+    "domain": 7,
+    "q": "A team's root CLAUDE.md has grown to cover conventions for every subproject. Engineers report that rules meant for one module are being applied in unrelated ones. What is the fix?",
+    "choices": [
+      "Move module-specific guidance into scoped rules or nested CLAUDE.md files and remove contradictory instructions",
+      "Assume the nearest CLAUDE.md always overrides all contradictory instructions",
+      "Put every module rule in the root file and repeat it several times",
+      "Put secrets in CLAUDE.md so they are available to every module"
+    ],
+    "answer": [
+      0
+    ],
+    "why": "Instructions are added to context rather than treated as a guaranteed conflict-resolution system. Scope guidance and eliminate contradictions. Use enforceable settings or hooks when a rule must block an action.",
+    "type": "single",
+    "refs": [
+      "memory"
+    ],
+    "objective": "Claude Code instruction scope",
+    "chapter": "domain-7",
+    "origin": "Original practice scenario; adapted and reviewed from the owner’s study notes."
+  },
+  {
+    "id": 62,
+    "domain": 7,
+    "q": "A developer submits an AI-assisted change. Which TWO checks together address behavioral quality and human accountability?",
+    "choices": [
+      "Run meaningful tests against requirements, including important edge cases",
+      "Require the submitting developer to explain the change, risks, and limitations",
+      "Accept the change because the model says the implementation is correct",
+      "Treat passing a formatter as proof of correctness",
+      "Skip review when the generated patch is long",
+      "Delegate final ownership to the model provider"
+    ],
+    "answer": [
+      0,
+      1
+    ],
+    "why": "Tests provide evidence about behavior; a responsible developer must understand and own the change. Neither replaces security and maintainability review, but these two directly address the stated dimensions.",
+    "type": "multi",
+    "refs": [
+      "teams"
+    ],
+    "objective": "AI-assisted development",
+    "chapter": "domain-7",
+    "origin": "Original practice scenario; adapted and reviewed from the owner’s study notes."
+  },
+  {
+    "id": 63,
+    "domain": 7,
+    "q": "Choose the team artifact or mechanism that best fits each need. Use each option once.",
+    "why": "Guidance, enforcement, packaging, execution, recovery instructions, and ownership solve different problems. Choose the mechanism that makes the needed behavior explicit and maintainable.",
+    "type": "match",
+    "labels": [
+      "Project CLAUDE.md",
+      "Enforced permissions or hooks",
+      "Versioned plugin",
+      "Non-interactive CLI invocation",
+      "Runbook",
+      "Escalation path"
+    ],
+    "rows": [
+      {
+        "text": "Record shared repository conventions and test commands as model guidance",
+        "answer": 0
+      },
+      {
+        "text": "Block a prohibited tool action regardless of a prompt’s suggestion",
+        "answer": 1
+      },
+      {
+        "text": "Distribute a reusable capability across several codebases",
+        "answer": 2
+      },
+      {
+        "text": "Run an automated CI task and receive machine-readable output",
+        "answer": 3
+      },
+      {
+        "text": "Document a recurring symptom, diagnosis, and recovery procedure",
+        "answer": 4
+      },
+      {
+        "text": "Name who takes ownership when an incident exceeds the team’s remit",
+        "answer": 5
+      }
+    ],
+    "refs": [
+      "teams",
+      "memory",
+      "headless"
+    ],
+    "objective": "Operational enablement",
+    "chapter": "domain-7",
+    "origin": "Original practice scenario; adapted and reviewed from the owner’s study notes."
+  }
+]
